@@ -1,0 +1,37 @@
+	.text
+	.global kalman
+
+kalman:
+//	VMOV.f32 S0, #0
+	MOV R4, #0
+	MOV R5, #1
+	VMOV.f32 S1, R4 // q
+	VMOV.f32 S2, R4 // r ALSO MEASUREMENT
+	VMOV.f32 S3, R4 // x
+	VMOV.f32 S4, R4 // p
+	VMOV.f32 S5, R4 // k
+	VLDM R3, {S1-S5}
+	MOV R4, #1
+	VMOV.F32 S9, R5
+
+update:
+	VLDR S0, [R1]
+	VADD.f32 S4, S4, S1
+	VADD.F32 S6, S4, S2 // P+R
+	VDIV.F32 S5, S4, S6 // P/(P+R)
+	VSUB.F32 S6, S2, S3 // (MEASUREMENT - X)
+	VMUL.F32 S7, S5, S6 // K*(MEASUREMENT -X)
+	VADD.F32 S3, S3, S7 // X + K*(MEASUREMENT -X)
+	VSUB.F32 S8, S9, S5 // (1-K)
+	VMUL.F32 S4, S8, S4 // (1-K)*P
+	VSTR S3, [R0] //STORE REFERENCE POINTER
+	ADD R0, R0, #4
+	ADD R1, R1, #4
+	CMP R4, R2
+	BLE update
+
+	BX LR
+
+
+
+
