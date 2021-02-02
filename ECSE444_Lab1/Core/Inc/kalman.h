@@ -1,14 +1,13 @@
 #ifndef _kalman
 #define _kalman
 
-	struct measurement {
+	typedef struct parameters{
 		float q;
 		float r;
 		float x;
 		float p;
 		float k;
-	};
+	}parameters;
 
-	int update(struct measurement);
-
+	void kalman(void *m,float measurement);
 #endif
