@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -49,7 +50,7 @@ ADC_HandleTypeDef hadc1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_ADC1_Init(void);
+static void MX_ADC1_Init(int check);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -87,7 +88,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC1_Init();
+  //MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -95,42 +96,92 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   int state = 0;
+    uint16_t reading;
+    uint16_t TS_CAL1;
+    uint16_t TS_CAL2;
+
+    uint16_t temperature_calc;
+    float readVoltage;
+    uint16_t tempRead;
+    float vrefint;
+    float newTempRead;
+
+    float delta;
+    float num;
+    float denom;
+    float computation;
+    float tempC;
+    float temp_cel;
+    float vref;
+#define FAC 1.1
+#define TS_CAL1  *((uint16_t*) 0x1FFF75A8)
+#define TS_CAL2  *((uint16_t*) 0x1FFF75CA)
 
 
 
-  while (1)
-  {
-	  uint16_t voltage;
-    /* USER CODE END WHILE */
 
-	  HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+    while (1)
+        {
+        	//uint16_t voltage;
+        	/* USER CODE END WHILE */
+        	//uint16_t voltage;
+        	/* USER CODE END WHILE */
+    	HAL_ADC_Start(&hadc1);
 
-	  if(HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET ){
-	 		  // is the button released
-	 		  while(HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET){}
-
-	 		  //init state to 0
-	 		  if(state ==0){
-	 			  //toggle state
-	 			  state = 1;
-	 			  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
-	 		  }
-	 		  else {
-	 			  //toggle again
-	 			  state = 0;
-	 			  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
-	 		  }
-
-	 	  }
+        	if(HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET ){
+        		// check - is the button released
+        		while(HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET){}
+        		//init state to 0
+        		if(state ==0){
+        			MX_ADC1_Init(1);
+        			tempRead = HAL_ADC_GetValue(&hadc1);
+        			tempRead *= FAC;
+        			tempC = __HAL_ADC_CALC_TEMPERATURE(3300, tempRead, ADC_RESOLUTION_12B);
+        			//tempC += 30.0;
 
 
-	  voltage = HAL_ADC_GetValue(&hadc1);
+        			// * Had to use HAL_ADC_CALC_TEMPERATURE because this did not work
+//        			  if(HAL_ADC_PollForConversion(&hadc1, 10000) == HAL_OK){
+//        			        tempRead = HAL_ADC_GetValue(&hadc1);
+//
+        			       	//num = 130 - 30;
+        			       	denom = TS_CAL2 - TS_CAL1;
+        			        //delta = tempRead*FAC - TS_CAL1;
+        			        //computation = 100.0/(denom);
+							temperature_calc = (100.0/(denom) * (tempRead*FAC - TS_CAL1)) + 30.0;
+//
+//
+//
+//        			   }
+
+        			state = 1;
+        			HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+
+        			//HAL_ADC_Stop(&hadc1);
+        			//ADC_Disable(&hadc1);
 
 
+        		}
+        		else if(state == 1) {
 
-    /* USER CODE BEGIN 3 */
-  }
+        			MX_ADC1_Init(0);
+
+        			readVoltage = HAL_ADC_GetValue(&hadc1);
+        			vrefint = readVoltage * 3.30/4096.0;
+        			vref = vrefint*4096.0/readVoltage;
+        			state = 0;
+        			HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+        			//HAL_ADC_Stop(&hadc1);
+        			//ADC_Disable(&hadc1);
+
+
+        		}
+
+        	}
+        	HAL_ADC_Stop(&hadc1);
+
+        	/* USER CODE BEGIN 3 */
+        }
   /* USER CODE END 3 */
 }
 
@@ -201,7 +252,7 @@ void SystemClock_Config(void)
   * @param None
   * @retval None
   */
-static void MX_ADC1_Init(void)
+static void MX_ADC1_Init(int check)
 {
 
   /* USER CODE BEGIN ADC1_Init 0 */
@@ -236,9 +287,18 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_VREFINT;
-  sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+  if (check ==1){
+	  sConfig.Channel = ADC_CHANNEL_VREFINT;
+	  //sConfig.Rank = ADC_REGULAR_RANK_1;
+
+  }else {
+	  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+	  //sConfig.Rank = ADC_REGULAR_RANK_2;
+
+  }
+//  sConfig.Channel = ADC_CHANNEL_VREFINT;
+//  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_640CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
@@ -247,6 +307,14 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
+  //sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  //sConfig.Rank = ADC_REGULAR_RANK_2;
+  //sConfig.SamplingTime = ADC_SAMPLETIME_640CYCLES_5;
+
+//  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
 
   /* USER CODE END ADC1_Init 2 */
 
@@ -263,7 +331,6 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
