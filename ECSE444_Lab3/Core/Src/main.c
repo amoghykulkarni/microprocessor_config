@@ -72,12 +72,19 @@ uint16_t triangleWave;
 int increment = 1;
 int threshold = 255;
 int threshold2 = 4095;
-uint32_t delay = 1;
-uint32_t time;
+uint32_t delay = 14;
+uint32_t timeS;
+uint32_t deltaTimeS;
+uint32_t timeT;
+uint32_t deltaTimeT;
+uint32_t timeW;
+uint32_t deltaTimeW;
 float Fs;
 float Ft;
+float Fw;
+uint32_t currT;
 
-uint8_t output;
+float output;
 
 
 
@@ -120,32 +127,41 @@ int main(void)
 
   HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
   float x = 0;
+  int deltaS = (threshold + 1)/16;
+  int deltaT = 2*deltaS;
+  int flag = 1;
 
 
   while (1)
   {
 
     /* USER CODE END WHILE */
+	  HAL_Delay(970);
+	  currT = HAL_GetTick();
+	  timeS = HAL_GetTick();
 
-	  if(saw != threshold2){
-		  saw += 16;
+	  if(saw != threshold){
+		  saw += deltaS;
 		  HAL_Delay(delay);
 	  } else {
 		  saw = 0;
-		  HAL_Delay(delay);
+		  //HAL_Delay(500);
 	  }
+	  deltaTimeS = HAL_GetTick() - timeS;
+	  Fs = (float) 1000/deltaTimeS;
 
 	 HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_8B_R, saw);
 
 	 HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
 
+	 timeT = HAL_GetTick();
 	  //Generate Triangle Wave
 	  if(increment){
 		  if(triangleWave >= threshold){
 			  increment = 0;
 			  //HAL_Delay(delay);
 		  }else{
-			  triangleWave += 32;
+			  triangleWave += deltaT;
 			  HAL_Delay(delay);
 		  }
 	  }
@@ -154,17 +170,28 @@ int main(void)
 			  increment = 1;
 			  //HAL_Delay(delay);
 		  }else{
-			  triangleWave-= 32;
+			  triangleWave-= deltaT;
 			  HAL_Delay(delay);
 		  }
 	  }
+	  deltaTimeT = HAL_GetTick() - timeT;
+	  Ft = (float)1000/deltaTimeT;
 	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, triangleWave);
 
-		  output = (uint8_t)3*arm_sin_f32(x);
-		  x += M_PI/8;
+	  timeW = HAL_GetTick();
+	  if(flag ==1){
+		  output = 128*(1+arm_sin_f32(x));
+		  x += 0.3926; //(2*0.19634);
 		  HAL_Delay(delay);
+	  }
 
-		  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, output);
+	  deltaTimeW = HAL_GetTick() - timeW;
+	  Fw = (float)1000/deltaTimeW;
+
+
+
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, (uint8_t)output);
+
 
 
 
