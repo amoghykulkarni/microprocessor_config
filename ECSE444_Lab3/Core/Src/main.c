@@ -67,12 +67,12 @@ static void MX_TIM2_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-uint8_t saw;
+uint16_t saw;
 uint16_t triangleWave;
 int increment = 1;
 int threshold = 255;
 int threshold2 = 4095;
-uint32_t delay = 14;
+uint32_t delay = 1/2;
 uint32_t timeS;
 uint32_t deltaTimeS;
 uint32_t timeT;
@@ -85,6 +85,10 @@ float Fw;
 uint32_t currT;
 
 float output;
+
+//#define SAW
+//#define TRIANGLE
+#define SINE
 
 
 
@@ -126,8 +130,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
+  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
   float x = 0;
-  int deltaS = (threshold + 1)/16;
+  int deltaS = (threshold2 + 1)/16;
   int deltaT = 2*deltaS;
   int flag = 1;
 
@@ -136,11 +141,14 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-	  HAL_Delay(970);
+    /* USER CODE BEGIN 3 */
+
+	  //HAL_Delay(800);
+#ifdef SAW
 	  currT = HAL_GetTick();
 	  timeS = HAL_GetTick();
 
-	  if(saw != threshold){
+	  if(saw <= threshold2){
 		  saw += deltaS;
 		  HAL_Delay(delay);
 	  } else {
@@ -150,14 +158,15 @@ int main(void)
 	  deltaTimeS = HAL_GetTick() - timeS;
 	  Fs = (float) 1000/deltaTimeS;
 
-	 HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_8B_R, saw);
+	 HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, saw);
+#endif
 
-	 HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
+#ifdef TRIANGLE
 
 	 timeT = HAL_GetTick();
 	  //Generate Triangle Wave
 	  if(increment){
-		  if(triangleWave >= threshold){
+		  if(triangleWave >= threshold2){
 			  increment = 0;
 			  //HAL_Delay(delay);
 		  }else{
@@ -176,26 +185,23 @@ int main(void)
 	  }
 	  deltaTimeT = HAL_GetTick() - timeT;
 	  Ft = (float)1000/deltaTimeT;
-	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, triangleWave);
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, triangleWave);
+#endif
 
+#ifdef SINE
 	  timeW = HAL_GetTick();
 	  if(flag ==1){
-		  output = 128*(1+arm_sin_f32(x));
-		  x += 0.3926; //(2*0.19634);
+		  output = (2047.5)*(1+arm_sin_f32(x));
+		  // samples 0 -15 --> 16 --> (2*3.14)/16 = 0.3926
+		  x += ((2*PI)/16);//0.3926; //(2*0.19634);
 		  HAL_Delay(delay);
 	  }
 
 	  deltaTimeW = HAL_GetTick() - timeW;
 	  Fw = (float)1000/deltaTimeW;
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, (uint16_t)output);
+#endif
 
-
-
-	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, (uint8_t)output);
-
-
-
-
-    /* USER CODE BEGIN 3 */
       }
 
       //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, triangleWave);
