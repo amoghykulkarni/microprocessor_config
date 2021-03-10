@@ -60,6 +60,9 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+//#define SAW
+//#define SINE
+//#define TRIANGLE
 
 /* USER CODE END 0 */
 
@@ -72,7 +75,7 @@ uint16_t triangleWave;
 int increment = 1;
 int threshold = 255;
 int threshold2 = 4095;
-uint32_t delay = 1/2;
+uint32_t delay = 0.25;
 uint32_t timeS;
 uint32_t deltaTimeS;
 uint32_t timeT;
@@ -86,9 +89,8 @@ uint32_t currT;
 
 float output;
 
-//#define SAW
-//#define TRIANGLE
-#define SINE
+
+
 
 
 
@@ -143,66 +145,72 @@ int main(void)
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
 
-	  //HAL_Delay(800);
-#ifdef SAW
-	  currT = HAL_GetTick();
-	  timeS = HAL_GetTick();
+
+//#ifdef SAW
+	  //currT = HAL_GetTick();
+	  //timeS = HAL_GetTick();
+	  //HAL_Delay(delay);
+
+
 
 	  if(saw <= threshold2){
 		  saw += deltaS;
-		  HAL_Delay(delay);
+
 	  } else {
 		  saw = 0;
-		  //HAL_Delay(500);
 	  }
-	  deltaTimeS = HAL_GetTick() - timeS;
-	  Fs = (float) 1000/deltaTimeS;
+
+	  //deltaTimeS = HAL_GetTick() - timeS;
+	  //Fs = (float) 1000/deltaTimeS;
 
 	 HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, saw);
-#endif
+//#endif
 
-#ifdef TRIANGLE
+//#ifdef TRIANGLE
 
-	 timeT = HAL_GetTick();
-	  //Generate Triangle Wave
-	  if(increment){
-		  if(triangleWave >= threshold2){
-			  increment = 0;
-			  //HAL_Delay(delay);
-		  }else{
-			  triangleWave += deltaT;
-			  HAL_Delay(delay);
-		  }
-	  }
-	  else {
-		  if(triangleWave == 0){
-			  increment = 1;
-			  //HAL_Delay(delay);
-		  }else{
-			  triangleWave-= deltaT;
-			  HAL_Delay(delay);
-		  }
-	  }
-	  deltaTimeT = HAL_GetTick() - timeT;
-	  Ft = (float)1000/deltaTimeT;
-	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, triangleWave);
-#endif
+	 if(increment && triangleWave >= threshold2){
+		 increment =0;
+	 } else if(increment){
+		 triangleWave+=deltaT;
+	 }else if(triangleWave == 0){
+		 increment =1;
+	 }else{
+		 triangleWave-= deltaT;
+	 }
 
-#ifdef SINE
-	  timeW = HAL_GetTick();
-	  if(flag ==1){
-		  output = (2047.5)*(1+arm_sin_f32(x));
-		  // samples 0 -15 --> 16 --> (2*3.14)/16 = 0.3926
-		  x += ((2*PI)/16);//0.3926; //(2*0.19634);
-		  HAL_Delay(delay);
-	  }
+//	  if(increment){
+//		  if(triangleWave >= threshold2){
+//			  increment = 0;
+//		  }else{
+//			  triangleWave += deltaT;
+//		  }
+//	  }
+//	  else {
+//		  if(triangleWave == 0){
+//			  increment = 1;
+//		  }else{
+//			  triangleWave-= deltaT;
+//		  }
+//	  }
 
-	  deltaTimeW = HAL_GetTick() - timeW;
-	  Fw = (float)1000/deltaTimeW;
+	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, triangleWave);
+//#endif
+
+
+
+	  HAL_Delay(delay);
+
+
+
+
+//#ifdef SINE
+	  output = (2047.5)*(1+arm_sin_f32(x));
+	  // samples 0 -15 --> 16 --> (2*3.14)/16 = 0.3926
+	  x += ((2*PI)/16);//0.3926; //(2*0.19634);
 	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, (uint16_t)output);
-#endif
-
+//#endif
       }
+
 
       //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, triangleWave);
   /* USER CODE END 3 */
