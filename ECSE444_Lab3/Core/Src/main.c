@@ -19,10 +19,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "arm_math.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "arm_math.h"
+#include "math.h"
 
 /* USER CODE END Includes */
 
@@ -42,6 +43,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 DAC_HandleTypeDef hdac1;
+DMA_HandleTypeDef hdma_dac1_ch1;
 
 TIM_HandleTypeDef htim2;
 
@@ -52,6 +54,7 @@ TIM_HandleTypeDef htim2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_DAC1_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
@@ -60,16 +63,46 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-//#define SAW
-//#define SINE
-//#define TRIANGLE
 
-/* USER CODE END 0 */
+uint8_t sineWave_1k[44]; //1000*44*1813 ~ 80MHz
+uint8_t sineWave_middle[66]; // 28 samples corresponding to 1.5kHz
+uint8_t sineWave_2k[88]; // 22 samples
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
+uint8_t size1 = 44;
+uint8_t size2 = 29;
+uint8_t size3 = 22;
+
+uint8_t state = 1;
+uint8_t nextDAC = 0;
+uint8_t currVal;
+uint8_t temp=0;
+
+float maxAmp = 55.0;
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+		HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+		state += 1;
+		if(state%4 == 1){
+			HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)sineWave_1k, size1, DAC_ALIGN_8B_R);
+		}else if(state%4 == 2){
+			HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)sineWave_middle, size2, DAC_ALIGN_8B_R);
+		}else if(state%4 == 3){
+			HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)sineWave_middle, size3, DAC_ALIGN_8B_R);
+		}
+}
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	uint8_t dacVal = sineWave_2k[nextDAC];
+	nextDAC += 1;
+	if(nextDAC > size3){
+		nextDAC = 0;
+	}
+	HAL_DAC_SetValue(&hdac1, DAC1_CHANNEL_1, DAC_ALIGN_8B_R, dacVal);
+
+
+}
+
+
 uint16_t saw;
 uint16_t triangleWave;
 int increment = 1;
@@ -87,13 +120,19 @@ float Ft;
 float Fw;
 uint32_t currT;
 
-float output;
+//#define PART1
+#define DACPLAY
+//#define TIMINT
 
 
 
 
+/* USER CODE END 0 */
 
-
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -119,6 +158,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_DAC1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
@@ -131,88 +171,77 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
-  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
+  //HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
+
   float x = 0;
   int deltaS = (threshold2 + 1)/16;
   int deltaT = 2*deltaS;
-  int flag = 1;
+
+  float output;
+  float angle1;
+  float angle2;
+  float angle3;
+
+  for(int i = 0; i < size1; i++){
+		  sineWave_1k[i] = maxAmp*(arm_sin_f32(angle1) + 1);
+		  angle1 += (3.14*2)/size1;
+  }
+  for(int i = 0; i < size2; i++){
+	  sineWave_middle[i] = maxAmp*(arm_sin_f32(angle2) + 1);
+	  angle2 += (3.14*2)/size2;
+  }
+  for(int i = 0; i < size3; i++){
+	  sineWave_2k[i] = maxAmp*(arm_sin_f32(angle3) + 1);
+	  angle3 += (3.14*2)/size3;
+  }
+
+#ifdef TIMINT
+  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
+  HAL_TIM_Base_Start_IT(&htim2);
+#endif
+
+#ifdef DACPLAY
+  // FOR DAC SOUND PLAY
+  HAL_TIM_Base_Start(&htim2);
+  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t *)sineWave_1k, size1, DAC_ALIGN_8B_R);
+#endif
+
+
 
 
   while (1)
   {
 
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
-
-
-//#ifdef SAW
-	  //currT = HAL_GetTick();
-	  //timeS = HAL_GetTick();
-	  //HAL_Delay(delay);
-
-
-
+#ifdef PART1
 	  if(saw <= threshold2){
 		  saw += deltaS;
 
 	  } else {
 		  saw = 0;
 	  }
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, saw);
 
-	  //deltaTimeS = HAL_GetTick() - timeS;
-	  //Fs = (float) 1000/deltaTimeS;
-
-	 HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, saw);
-//#endif
-
-//#ifdef TRIANGLE
-
-	 if(increment && triangleWave >= threshold2){
-		 increment =0;
-	 } else if(increment){
-		 triangleWave+=deltaT;
-	 }else if(triangleWave == 0){
-		 increment =1;
-	 }else{
-		 triangleWave-= deltaT;
-	 }
-
-//	  if(increment){
-//		  if(triangleWave >= threshold2){
-//			  increment = 0;
-//		  }else{
-//			  triangleWave += deltaT;
-//		  }
-//	  }
-//	  else {
-//		  if(triangleWave == 0){
-//			  increment = 1;
-//		  }else{
-//			  triangleWave-= deltaT;
-//		  }
-//	  }
-
+	  if(increment && triangleWave >= threshold2){
+		  increment =0;
+	  } else if(increment){
+		  triangleWave+=deltaT;
+	  }else if(triangleWave == 0){
+		  increment =1;
+	  }else{
+		  triangleWave-= deltaT;
+	  }
 	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, triangleWave);
-//#endif
-
-
-
 	  HAL_Delay(delay);
 
-
-
-
-//#ifdef SINE
 	  output = (2047.5)*(1+arm_sin_f32(x));
 	  // samples 0 -15 --> 16 --> (2*3.14)/16 = 0.3926
 	  x += ((2*PI)/16);//0.3926; //(2*0.19634);
-	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, (uint16_t)output);
-//#endif
-      }
-
-
-      //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_8B_R, triangleWave);
+	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, (uint16_t)output);
+#endif
+  }
   /* USER CODE END 3 */
 }
 
@@ -291,19 +320,12 @@ static void MX_DAC1_Init(void)
   /** DAC channel OUT1 config
   */
   sConfig.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
-  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+  sConfig.DAC_Trigger = DAC_TRIGGER_T2_TRGO;
   sConfig.DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE;
   sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
   sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
   sConfig.DAC_UserTrimming = DAC_TRIMMING_FACTORY;
   if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** DAC channel OUT2 config
-  */
-  sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
-  if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -334,7 +356,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 4294967295;
+  htim2.Init.Period = 1813;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -346,7 +368,7 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
   {
@@ -355,6 +377,23 @@ static void MX_TIM2_Init(void)
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMAMUX1_CLK_ENABLE();
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 
 }
 
@@ -373,17 +412,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : USER_BUTTON_Pin */
-  GPIO_InitStruct.Pin = USER_BUTTON_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(USER_BUTTON_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_GREEN_Pin */
   GPIO_InitStruct.Pin = LED_GREEN_Pin;
@@ -391,6 +426,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GREEN_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
