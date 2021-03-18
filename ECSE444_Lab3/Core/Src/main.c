@@ -67,7 +67,7 @@ static void MX_TIM2_Init(void);
 
 uint8_t sineWave_1k[44]; // 1/sample * 44.1 kHz = 1000
 uint8_t sineWave_middle[29]; // 29-> 1/sample * 44.1 kHz = 1.5kHz
-uint8_t sineWave_2k[22]; // 22 samples -> 1/sample * 44.1 kHz =
+uint8_t sineWave_2k[22]; // 22 samples -> 1/sample * 44.1 kHz = 2kHz
 
 uint8_t sineWaveA;
 uint8_t sineWaveB;
@@ -91,9 +91,6 @@ uint8_t dacVal3;
 uint8_t sineWaves[3];
 
 float maxAmp = 55.0;
-
-
-
 
 uint16_t saw;
 uint16_t triangleWave;
@@ -135,6 +132,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	// 80MHz/44.1 kHz  = 1813
 
 	state2+=1;
 
@@ -163,9 +161,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	else if(state2 > period_300){
 		state2 = 1;
 	}
+	//Not necessary
 	if(temp >= 4){
 		temp=0;
 	}
+	// -----
 	HAL_DAC_SetValue(&hdac1, DAC1_CHANNEL_1, DAC_ALIGN_8B_R, sineWaves[temp]);
 }
 
@@ -188,7 +188,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -219,10 +219,11 @@ int main(void)
   //HAL_DAC_Start(&hdac1, DAC1_CHANNEL_2);
 
   float x = 0;
+
   int deltaS = (threshold2 + 1)/16;
   int deltaT = 2*deltaS;
 
-  float output;
+  float sineWave;
   float angle1;
   float angle2;
   float angle3;
@@ -243,7 +244,6 @@ int main(void)
 
 #ifdef TIMINT
   HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
-
   HAL_TIM_Base_Start_IT(&htim2);
 #endif
 
@@ -260,34 +260,37 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-//#ifdef PART1
-//	  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
-//
-//	  if(saw <= threshold2){
-//		  saw += deltaS;
-//
-//	  } else {
-//		  saw = 0;
-//	  }
-//	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, saw);
-//
-//	  if(increment && triangleWave >= threshold2){
-//		  increment =0;
-//	  } else if(increment){
-//		  triangleWave+=deltaT;
-//	  }else if(triangleWave == 0){
-//		  increment =1;
-//	  }else{
-//		  triangleWave-= deltaT;
-//	  }
-//	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, triangleWave);
-//	  HAL_Delay(delay);
-//
-//	  output = (2047.5)*(1+arm_sin_f32(x));
-//	  // samples 0 -15 --> 16 --> (2*3.14)/16 = 0.3926
-//	  x += ((2*PI)/16);//0.3926; //(2*0.19634);
-//	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, (uint16_t)output);
-//#endif
+#ifdef PART1
+
+	  HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
+
+	  if(saw <= threshold2){
+		  saw += deltaS;
+
+	  } else {
+		  saw = 0;
+	  }
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, saw);
+
+	  if(increment && triangleWave >= threshold2){
+		  increment =0;
+	  } else if(increment){
+		  triangleWave+=deltaT;
+	  }else if(triangleWave == 0){
+		  increment =1;
+	  }else{
+		  triangleWave-= deltaT;
+	  }
+	  //HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, triangleWave);
+	  HAL_Delay(delay);
+
+	  sineWave = (2047.5)*(1+arm_sin_f32(x));
+	  // samples 0 -15 --> 16 --> (2*3.14)/16 = 0.3926
+	  x += ((2*PI)/16);//0.3926; //(2*0.19634);
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, (uint16_t)output);
+
+
+#endif
   }
   /* USER CODE END 3 */
 }
