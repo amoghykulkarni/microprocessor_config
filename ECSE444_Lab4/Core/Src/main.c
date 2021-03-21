@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -48,7 +49,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define PART1
+//#define PART1
+#define size 35
+#define buffSize 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -61,8 +64,12 @@ I2C_HandleTypeDef hi2c2;
 
 UART_HandleTypeDef huart1;
 
+osThreadId checkButtonHandle;
+osThreadId transmitDataHandle;
+osThreadId readSensorDataHandle;
 /* USER CODE BEGIN PV */
 //Variables
+//int size = 100;
 uint8_t state = 0;
 float hValue;
 float tValue;
@@ -70,11 +77,11 @@ int16_t accelero[3];
 float psensor;
 float gyro[3]; // Not used
 //Buffers for SPRINTF
-char hSensor_buffer[100];
-char tSensor_buffer[100];
-char accelero_buffer[100];
-char gyro_buffer[100]; // Not Used
-char pressure_buff[100];
+char hSensor_buffer[buffSize];
+char tSensor_buffer[buffSize];
+char accelero_buffer[buffSize];
+char gyro_buffer[buffSize]; // Not Used
+char pressure_buff[buffSize];
 
 /* USER CODE END PV */
 
@@ -83,6 +90,10 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_USART1_UART_Init(void);
+void StartDefaultTask(void const * argument);
+void StartTask02(void const * argument);
+void StartTask03(void const * argument);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -153,6 +164,43 @@ int main(void)
 
   /* USER CODE END 2 */
 
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of checkButton */
+  osThreadDef(checkButton, StartDefaultTask, osPriorityNormal, 0, 128);
+  checkButtonHandle = osThreadCreate(osThread(checkButton), NULL);
+
+  /* definition and creation of transmitData */
+  osThreadDef(transmitData, StartTask02, osPriorityIdle, 0, 128);
+  transmitDataHandle = osThreadCreate(osThread(transmitData), NULL);
+
+  /* definition and creation of readSensorData */
+  osThreadDef(readSensorData, StartTask03, osPriorityIdle, 0, 128);
+  readSensorDataHandle = osThreadCreate(osThread(readSensorData), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 #ifdef PART1
@@ -166,8 +214,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+#ifdef PART1
 	  HAL_Delay(10);
+#endif
 
   }
   /* USER CODE END 3 */
@@ -353,7 +402,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(LED_GREEN_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
@@ -361,6 +410,96 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(10000);
+    //Check if button pressed and increment state
+    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET){
+    	state = (state+1)%4;
+    }
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_StartTask02 */
+/**
+* @brief Function implementing the transmitData thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask02 */
+void StartTask02(void const * argument)
+{
+  /* USER CODE BEGIN StartTask02 */
+  /* Infinite loop */
+	for(;;)
+	{
+		osDelay(2500);
+		if(state == 0){
+			hValue = BSP_HSENSOR_ReadHumidity();
+		}
+		else if(state == 1){
+			tValue = BSP_TSENSOR_ReadTemp();
+
+		}
+		else if(state == 2){
+			BSP_ACCELERO_AccGetXYZ(accelero);
+
+		}
+		else if(state == 3){
+			psensor = BSP_PSENSOR_ReadPressure();
+
+		}
+
+	}
+  /* USER CODE END StartTask02 */
+}
+
+/* USER CODE BEGIN Header_StartTask03 */
+/**
+* @brief Function implementing the readSensorData thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask03 */
+void StartTask03(void const * argument)
+{
+  /* USER CODE BEGIN StartTask03 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(2500);
+	if(state%4 == 0){
+		sprintf(hSensor_buffer, "\n Humidity Value: %d\n", (int)hValue);
+		HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, 25, 10000);
+	}
+	else if(state%4 == 1){
+		sprintf(tSensor_buffer, "\n Temperature Value: %d\n", (int)tValue);
+		HAL_UART_Transmit(&huart1, (uint8_t*)tSensor_buffer, 25, 10000);
+	}
+	else if(state%4 == 2){
+		sprintf(accelero_buffer, "\n Accelerometer Values: \n X: %d Y: %d Z: %d\n", accelero[0], accelero[1], accelero[2]);
+		HAL_UART_Transmit(&huart1, (uint8_t*)accelero_buffer, 50, 10000);
+	}
+	else if(state%4 == 3){
+		sprintf(pressure_buff, "\n Pressure Value: %d\n", (int)psensor);
+		HAL_UART_Transmit(&huart1, (uint8_t*)pressure_buff, 25, 10000);
+	}
+  }
+  /* USER CODE END StartTask03 */
+}
 
  /**
   * @brief  Period elapsed callback in non blocking mode
