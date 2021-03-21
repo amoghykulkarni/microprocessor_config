@@ -31,11 +31,14 @@
  */
 #include "hts221.h"
 #include "lsm6dsl.h"
+#include "lps22hb.h"
 #include "stm32l4s5i_iot01.h"
 #include "stm32l4s5i_iot01_tsensor.h"
 #include "stm32l4s5i_iot01_hsensor.h"
 #include "stm32l4s5i_iot01_accelero.h"
 #include "stm32l4s5i_iot01_gyro.h"
+#include "stm32l4s5i_iot01_psensor.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +48,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define PART1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,13 +63,18 @@ UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 //Variables
+uint8_t state = 0;
 float hValue;
 float tValue;
-
-
+int16_t accelero[3];
+float psensor;
+float gyro[3]; // Not used
 //Buffers for SPRINTF
 char hSensor_buffer[100];
 char tSensor_buffer[100];
+char accelero_buffer[100];
+char gyro_buffer[100]; // Not Used
+char pressure_buff[100];
 
 /* USER CODE END PV */
 
@@ -80,6 +89,29 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#ifdef PART1
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+		HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+
+		if(state%4 == 0){
+			sprintf(hSensor_buffer, "Humidity Value: %d\n", (uint8_t)hValue);
+			HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, 100, 30000);
+		}
+		else if(state%4 == 1){
+			sprintf(tSensor_buffer, "Temperature Value: %d\n", (uint8_t)tValue);
+			HAL_UART_Transmit(&huart1, (uint8_t*)tSensor_buffer, 100, 30000);
+		}
+		else if(state%4 == 2){
+			sprintf(accelero_buffer, "Accelerometer Values: \n X: %d Y: %d Z: %d\n", accelero[0], accelero[1], accelero[2]);
+			HAL_UART_Transmit(&huart1, (uint8_t*)accelero_buffer, 100, 30000);
+		}
+		else if(state%4 == 3){
+			sprintf(pressure_buff, "Pressure Value: %d\n", (uint8_t)psensor);
+			HAL_UART_Transmit(&huart1, (uint8_t*)pressure_buff, 100, 30000);
+		}
+		state += 1;
+}
+#endif
 
 /* USER CODE END 0 */
 
@@ -101,6 +133,8 @@ int main(void)
   /* USER CODE BEGIN Init */
   BSP_HSENSOR_Init();
   BSP_TSENSOR_Init();
+  BSP_ACCELERO_Init();
+  BSP_PSENSOR_Init();
 
   /* USER CODE END Init */
 
@@ -121,18 +155,20 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+#ifdef PART1
+  hValue = BSP_HSENSOR_ReadHumidity();
+  tValue = BSP_TSENSOR_ReadTemp();
+  psensor = BSP_PSENSOR_ReadPressure();
+  BSP_ACCELERO_AccGetXYZ(accelero);
+#endif
+
+  while (1){
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  hValue = BSP_HSENSOR_ReadHumidity();
-	  tValue = BSP_TSENSOR_ReadTemp();
-	  sprintf(hSensor_buffer, "\n Humidity Value: %d\n", (int)hValue);
-	  sprintf(tSensor_buffer, "\n Temperature Value: %d\n", (int)tValue);
-	  HAL_UART_Transmit(&huart1, hSensor_buffer, 100, 30000);
-	  HAL_UART_Transmit(&huart1, tSensor_buffer, 100, 30000);
-	  HAL_Delay(100);
+
+	  HAL_Delay(10);
+
   }
   /* USER CODE END 3 */
 }
@@ -149,7 +185,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST) != HAL_OK)
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -163,7 +199,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 60;
+  RCC_OscInitStruct.PLL.PLLN = 40;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -180,7 +216,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -209,7 +245,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x307075B1;
+  hi2c2.Init.Timing = 0x10909CEC;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -269,15 +305,15 @@ static void MX_USART1_UART_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_8_8) != HAL_OK)
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
   {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_8_8) != HAL_OK)
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
   {
     Error_Handler();
   }
-  if (HAL_UARTEx_EnableFifoMode(&huart1) != HAL_OK)
+  if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -299,7 +335,6 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);

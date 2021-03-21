@@ -5,12 +5,14 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Core/Src/hts221.c \
+../Core/Src/lps22hb.c \
 ../Core/Src/lsm6dsl.c \
 ../Core/Src/main.c \
 ../Core/Src/stm32l4s5i_iot01.c \
 ../Core/Src/stm32l4s5i_iot01_accelero.c \
 ../Core/Src/stm32l4s5i_iot01_gyro.c \
 ../Core/Src/stm32l4s5i_iot01_hsensor.c \
+../Core/Src/stm32l4s5i_iot01_psensor.c \
 ../Core/Src/stm32l4s5i_iot01_tsensor.c \
 ../Core/Src/stm32l4xx_hal_msp.c \
 ../Core/Src/stm32l4xx_hal_timebase_tim.c \
@@ -21,12 +23,14 @@ C_SRCS += \
 
 OBJS += \
 ./Core/Src/hts221.o \
+./Core/Src/lps22hb.o \
 ./Core/Src/lsm6dsl.o \
 ./Core/Src/main.o \
 ./Core/Src/stm32l4s5i_iot01.o \
 ./Core/Src/stm32l4s5i_iot01_accelero.o \
 ./Core/Src/stm32l4s5i_iot01_gyro.o \
 ./Core/Src/stm32l4s5i_iot01_hsensor.o \
+./Core/Src/stm32l4s5i_iot01_psensor.o \
 ./Core/Src/stm32l4s5i_iot01_tsensor.o \
 ./Core/Src/stm32l4xx_hal_msp.o \
 ./Core/Src/stm32l4xx_hal_timebase_tim.o \
@@ -37,12 +41,14 @@ OBJS += \
 
 C_DEPS += \
 ./Core/Src/hts221.d \
+./Core/Src/lps22hb.d \
 ./Core/Src/lsm6dsl.d \
 ./Core/Src/main.d \
 ./Core/Src/stm32l4s5i_iot01.d \
 ./Core/Src/stm32l4s5i_iot01_accelero.d \
 ./Core/Src/stm32l4s5i_iot01_gyro.d \
 ./Core/Src/stm32l4s5i_iot01_hsensor.d \
+./Core/Src/stm32l4s5i_iot01_psensor.d \
 ./Core/Src/stm32l4s5i_iot01_tsensor.d \
 ./Core/Src/stm32l4xx_hal_msp.d \
 ./Core/Src/stm32l4xx_hal_timebase_tim.d \
@@ -55,6 +61,8 @@ C_DEPS += \
 # Each subdirectory must supply rules for building sources it contributes
 Core/Src/hts221.o: ../Core/Src/hts221.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/hts221.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+Core/Src/lps22hb.o: ../Core/Src/lps22hb.c
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/lps22hb.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/lsm6dsl.o: ../Core/Src/lsm6dsl.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/lsm6dsl.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/main.o: ../Core/Src/main.c
@@ -67,6 +75,8 @@ Core/Src/stm32l4s5i_iot01_gyro.o: ../Core/Src/stm32l4s5i_iot01_gyro.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/stm32l4s5i_iot01_gyro.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/stm32l4s5i_iot01_hsensor.o: ../Core/Src/stm32l4s5i_iot01_hsensor.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/stm32l4s5i_iot01_hsensor.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+Core/Src/stm32l4s5i_iot01_psensor.o: ../Core/Src/stm32l4s5i_iot01_psensor.c
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/stm32l4s5i_iot01_psensor.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/stm32l4s5i_iot01_tsensor.o: ../Core/Src/stm32l4s5i_iot01_tsensor.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/stm32l4s5i_iot01_tsensor.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/stm32l4xx_hal_msp.o: ../Core/Src/stm32l4xx_hal_msp.c
