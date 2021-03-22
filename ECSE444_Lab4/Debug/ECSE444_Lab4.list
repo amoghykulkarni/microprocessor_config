@@ -35,15 +35,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  15 .debug_ranges 000017b8  00000000  00000000  00044fb8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_macro  0002e931  00000000  00000000  00046770  2**0
+ 16 .debug_macro  0002e937  00000000  00000000  00046770  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_line   00016508  00000000  00000000  000750a1  2**0
+ 17 .debug_line   00016506  00000000  00000000  000750a7  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    001197a1  00000000  00000000  0008b5a9  2**0
+ 18 .debug_str    001197a8  00000000  00000000  0008b5ad  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  001a4d4a  2**0
+ 19 .comment      0000007b  00000000  00000000  001a4d55  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00006d08  00000000  00000000  001a4dc8  2**2
+ 20 .debug_frame  00006d08  00000000  00000000  001a4dd0  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -1586,7 +1586,7 @@ int main(void)
  8000ce2:	f000 f8c3 	bl	8000e6c <MX_I2C2_Init>
   MX_USART1_UART_Init();
  8000ce6:	f000 f901 	bl	8000eec <MX_USART1_UART_Init>
-  /* add queues, ... */
+#ifdef PART2
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -1650,10 +1650,10 @@ int main(void)
   /* Start scheduler */
   osKernelStart();
  8000d58:	f004 feae 	bl	8005ab8 <osKernelStart>
-  tValue = BSP_TSENSOR_ReadTemp();
-  psensor = BSP_PSENSOR_ReadPressure();
-  BSP_ACCELERO_AccGetXYZ(accelero);
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 #endif
+
 
   while (1){
  8000d5c:	e7fe      	b.n	8000d5c <main+0x9c>

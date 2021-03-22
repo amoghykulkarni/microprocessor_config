@@ -50,7 +50,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 //#define PART1
+#define PART2
 #define size 35
 #define buffSize 100
 #define OSDELAY 1000
@@ -183,6 +185,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
+#ifdef PART2
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -208,19 +211,19 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-#ifdef PART1
-  hValue = BSP_HSENSOR_ReadHumidity();
-  tValue = BSP_TSENSOR_ReadTemp();
-  psensor = BSP_PSENSOR_ReadPressure();
-  BSP_ACCELERO_AccGetXYZ(accelero);
 #endif
+
 
   while (1){
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 #ifdef PART1
-	  HAL_Delay(10);
+	  hValue = BSP_HSENSOR_ReadHumidity();
+	  tValue = BSP_TSENSOR_ReadTemp();
+	  psensor = BSP_PSENSOR_ReadPressure();
+	  BSP_ACCELERO_AccGetXYZ(accelero);
+	  HAL_Delay(100);
 #endif
 
   }
@@ -417,6 +420,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
+#ifdef PART2
 /**
   * @brief  Function implementing the defaultTask thread.
   * @param  argument: Not used
@@ -515,6 +519,7 @@ void ReadSensorDataTask(void const * argument)
   }
   /* USER CODE END StartTask03 */
 }
+#endif
 
  /**
   * @brief  Period elapsed callback in non blocking mode
