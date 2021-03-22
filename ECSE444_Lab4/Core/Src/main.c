@@ -40,6 +40,7 @@
 #include "stm32l4s5i_iot01_gyro.h"
 #include "stm32l4s5i_iot01_psensor.h"
 #include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +53,8 @@
 //#define PART1
 #define size 35
 #define buffSize 100
+#define OSDELAY 1000
+#define OSDELAY2 250
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -82,6 +85,8 @@ char tSensor_buffer[buffSize];
 char accelero_buffer[buffSize];
 char gyro_buffer[buffSize]; // Not Used
 char pressure_buff[buffSize];
+char msgBuff[buffSize];
+char msgBuff2[buffSize];
 
 /* USER CODE END PV */
 
@@ -90,9 +95,9 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_USART1_UART_Init(void);
-void StartDefaultTask(void const * argument);
-void StartTask02(void const * argument);
-void StartTask03(void const * argument);
+void ButtonPressedTask(void const * argument);
+void TransmitDataTask(void const * argument);
+void ReadSensorDataTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -105,20 +110,20 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
 
 		if(state%4 == 0){
-			sprintf(hSensor_buffer, "Humidity Value: %d\n", (uint8_t)hValue);
-			HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, 100, 30000);
+			sprintf(hSensor_buffer, "\n Humidity Value: %d\r", (int)hValue);
+			HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, strlen(hSensor_buffer), HAL_UART_TIMEOUT_VALUE);
 		}
 		else if(state%4 == 1){
-			sprintf(tSensor_buffer, "Temperature Value: %d\n", (uint8_t)tValue);
-			HAL_UART_Transmit(&huart1, (uint8_t*)tSensor_buffer, 100, 30000);
+			sprintf(tSensor_buffer, "\n Temperature Value: %d\r", (int)tValue);
+			HAL_UART_Transmit(&huart1, (uint8_t*)tSensor_buffer, strlen(tSensor_buffer), HAL_UART_TIMEOUT_VALUE);
 		}
 		else if(state%4 == 2){
-			sprintf(accelero_buffer, "Accelerometer Values: \n X: %d Y: %d Z: %d\n", accelero[0], accelero[1], accelero[2]);
-			HAL_UART_Transmit(&huart1, (uint8_t*)accelero_buffer, 100, 30000);
+			sprintf(accelero_buffer, "\n Accelerometer Values: X: %d Y: %d Z: %d\r", accelero[0], accelero[1], accelero[2]);
+			HAL_UART_Transmit(&huart1, (uint8_t*)accelero_buffer, strlen(accelero_buffer), HAL_UART_TIMEOUT_VALUE);
 		}
 		else if(state%4 == 3){
-			sprintf(pressure_buff, "Pressure Value: %d\n", (uint8_t)psensor);
-			HAL_UART_Transmit(&huart1, (uint8_t*)pressure_buff, 100, 30000);
+			sprintf(pressure_buff, "\n Pressure Value: %d\r", (int)psensor);
+			HAL_UART_Transmit(&huart1, (uint8_t*)pressure_buff, strlen(pressure_buff), HAL_UART_TIMEOUT_VALUE);
 		}
 		state += 1;
 }
@@ -182,15 +187,15 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of checkButton */
-  osThreadDef(checkButton, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(checkButton, ButtonPressedTask, osPriorityNormal, 0, 128);
   checkButtonHandle = osThreadCreate(osThread(checkButton), NULL);
 
   /* definition and creation of transmitData */
-  osThreadDef(transmitData, StartTask02, osPriorityIdle, 0, 128);
+  osThreadDef(transmitData, TransmitDataTask, osPriorityIdle, 0, 128);
   transmitDataHandle = osThreadCreate(osThread(transmitData), NULL);
 
   /* definition and creation of readSensorData */
-  osThreadDef(readSensorData, StartTask03, osPriorityIdle, 0, 128);
+  osThreadDef(readSensorData, ReadSensorDataTask, osPriorityIdle, 0, 128);
   readSensorDataHandle = osThreadCreate(osThread(readSensorData), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -418,16 +423,18 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
+void ButtonPressedTask(void const * argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)
   {
-    osDelay(10000);
+    osDelay(OSDELAY);
     //Check if button pressed and increment state
     if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET){
     	state = (state+1)%4;
+    	sprintf(msgBuff, "----- Button Pressed! Now in State: %d ------ \r", state);
+    	HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff, strlen(msgBuff), HAL_UART_TIMEOUT_VALUE);
     }
   }
   /* USER CODE END 5 */
@@ -440,26 +447,34 @@ void StartDefaultTask(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTask02 */
-void StartTask02(void const * argument)
+void TransmitDataTask(void const * argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
 	for(;;)
 	{
-		osDelay(2500);
+		osDelay(OSDELAY2);
 		if(state == 0){
 			hValue = BSP_HSENSOR_ReadHumidity();
+			sprintf(msgBuff2, "\n Transmitting...\r");
+			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
 		}
 		else if(state == 1){
 			tValue = BSP_TSENSOR_ReadTemp();
+			sprintf(msgBuff2, "\n Transmitting...\r");
+			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
 
 		}
 		else if(state == 2){
 			BSP_ACCELERO_AccGetXYZ(accelero);
+			sprintf(msgBuff2, "\n Transmitting...\r");
+			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
 
 		}
 		else if(state == 3){
 			psensor = BSP_PSENSOR_ReadPressure();
+			sprintf(msgBuff2, "\n Transmitting...\r");
+			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
 
 		}
 
@@ -474,28 +489,28 @@ void StartTask02(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTask03 */
-void StartTask03(void const * argument)
+void ReadSensorDataTask(void const * argument)
 {
   /* USER CODE BEGIN StartTask03 */
   /* Infinite loop */
   for(;;)
   {
-    osDelay(2500);
+    osDelay(OSDELAY2);
 	if(state%4 == 0){
-		sprintf(hSensor_buffer, "\n Humidity Value: %d\n", (int)hValue);
-		HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, 25, 10000);
+		sprintf(hSensor_buffer, "\n Humidity Value: %d\r", (int)hValue);
+		HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, strlen(hSensor_buffer), HAL_UART_TIMEOUT_VALUE);
 	}
 	else if(state%4 == 1){
-		sprintf(tSensor_buffer, "\n Temperature Value: %d\n", (int)tValue);
-		HAL_UART_Transmit(&huart1, (uint8_t*)tSensor_buffer, 25, 10000);
+		sprintf(tSensor_buffer, "\n Temperature Value: %d C\r", (int)tValue);
+		HAL_UART_Transmit(&huart1, (uint8_t*)tSensor_buffer, strlen(tSensor_buffer), HAL_UART_TIMEOUT_VALUE);
 	}
 	else if(state%4 == 2){
-		sprintf(accelero_buffer, "\n Accelerometer Values: \n X: %d Y: %d Z: %d\n", accelero[0], accelero[1], accelero[2]);
-		HAL_UART_Transmit(&huart1, (uint8_t*)accelero_buffer, 50, 10000);
+		sprintf(accelero_buffer, "\n Accelerometer Values: X: %d Y: %d Z: %d\r", accelero[0], accelero[1], accelero[2]);
+		HAL_UART_Transmit(&huart1, (uint8_t*)accelero_buffer, strlen(accelero_buffer), HAL_UART_TIMEOUT_VALUE);
 	}
 	else if(state%4 == 3){
-		sprintf(pressure_buff, "\n Pressure Value: %d\n", (int)psensor);
-		HAL_UART_Transmit(&huart1, (uint8_t*)pressure_buff, 25, 10000);
+		sprintf(pressure_buff, "\n Pressure Value: %d Pa\r", (int)psensor);
+		HAL_UART_Transmit(&huart1, (uint8_t*)pressure_buff, strlen(pressure_buff), HAL_UART_TIMEOUT_VALUE);
 	}
   }
   /* USER CODE END StartTask03 */
