@@ -19,12 +19,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "kalman.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "stm32l4xx_hal.h"
-#include "arm_math.h"
 #include "math.h"
+#include "arm_math.h"
+#include "kalman.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -48,6 +45,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
 
@@ -56,6 +54,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -69,9 +68,6 @@ static void MX_GPIO_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-
-kalman_state kstate;
-
 int KalmanFilter(float *InputArray, float *OutputArray, kalman_state *kstate, int length){
 	for (int i = 0; i<length; i++){
 			kalman(&kstate, InputArray[i]);
@@ -99,10 +95,6 @@ int kalman_c(float *InputArray, float *OutputArray, kalman_state *kstate, int le
 		kstate->p = kstate->p + kstate->q;
 		kstate->k = kstate->p / (kstate->p + kstate->r);
 		kstate->x = kstate->x + kstate->k * (InputArray[i] - kstate->x);
-		if(kstate->x != kstate->x){
-			return 1;
-		}
-
 		kstate->p = (1-kstate->k)*kstate->p;
 		OutputArray[i] = kstate->x;
 		i++;
@@ -123,13 +115,11 @@ void sub_c(float *input1, float *input2, float *diff, int len){
 
 void avg_c(float *input,  int len, float *out){
 	int i = 0;
-	//float temp = 0;
 	while(i<len){
 		*out += input[i];
 		i++;
 	}
 	*out /= len;
-	//*out = temp;
 }
 
 void stdev_c(float *input, int len, float *result){
@@ -172,15 +162,10 @@ void corr_c(float *input1, float *input2, float *result, int len){
 			if(new == 0 || ((new>0)&&(new<len))){
 				result[i] = result[i] + input1[j]*input2[new];
 			}
-			/*
-			if(new< -len){
-				break;
-			} else if (new < len){
-				result[i] += input1[j] * input2[new];
-			}
-			*/
+
 		}
 	}
+}
 
 	/*
 	float mean1 = 0;
@@ -219,12 +204,6 @@ void corr_c(float *input1, float *input2, float *result, int len){
 	denominator = sqrt(denominator1*denominator2);
 	*result = numerator / denominator;
 	*result */
-}
-
-
-
-
-
 
 
 void kalman_cmsis(float *inputArr, float *cmsis_output, int len, kalman_state *ks){
@@ -247,8 +226,7 @@ void kalman_cmsis(float *inputArr, float *cmsis_output, int len, kalman_state *k
 	}
 
 }
-
-//float array_test[] = {8.36, 8.75, 11.625, 10.128735, 8.1927, 12.1278, 9.7657, 12.878, 11.6546, 12.876};
+//float array_test[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0};
 
 
 
@@ -345,11 +323,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
 
   /* USER CODE END 2 */
-
   struct kalman_state c_state;
   struct kalman_state kstate;
   /* Infinite loop */
@@ -358,6 +336,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+	  //Initial Values
 		float q = 0.1;
 		float r = 0.1;
 		float x = 5.0;
@@ -383,10 +363,14 @@ int main(void)
 		kstate.p = p;
 		kstate.k = k;
 
+		ITM_Port32(31) = 1;
 		//  ------------ CMSIS IMPLEMENTATIONS  ------------
 		kalman_cmsis(array_test, cmsis_output, size, &cmsis);
+		ITM_Port32(31) = 2;
+
 		//1. Subtraction
 		arm_sub_f32(array_test, cmsis_output, cmsis_diff, size);
+
 		//2. Standard Deviation and Average of Differences
 		arm_std_f32(cmsis_diff, size, &cmsis_stdev);
 		arm_mean_f32(cmsis_diff, size, &cmsis_diffavg);
@@ -394,25 +378,26 @@ int main(void)
 		arm_correlate_f32(array_test, size, cmsis_output, size, cmsis_corr);
 		//4. Convolution
 		arm_conv_f32(array_test, size, cmsis_output, size, cmsis_conv);
-		//  ------------ CMSIS IMPLEMENTATIONS  ------------
+		//  ------------ END OF CMSIS IMPLEMENTATIONS  ------------
+		ITM_Port32(31) = 3;
 
 		//  ------------ C IMPLEMENTATIONS  ------------
 		kalman_c(array_test, c_output, &c_state, size);
+		ITM_Port32(31) = 4;
 
 		sub_c(array_test, c_output, c_diff, size);
 		stdev_c(c_diff, size, &c_stdev);
 		avg_c(c_diff, size, &c_diffavg);
 		conv_c(array_test, c_output, c_conv, size);
 		corr_c(array_test, c_output, c_corr, size);
-
 		//  ------------ C IMPLEMENTATIONS  ------------
-
+		ITM_Port32(31) = 5;
 		for (int i = 0; i<size; i++){
 			//measurement = array_test[i];
 			kalman(&kstate, array_test[i]);
 			asm_output[i] = kstate.x;
 		}
-
+		ITM_Port32(31) = 6;
 
 		// ------------ ASSEMBLY IMPLEMENTATION ------------
 		//KalmanFilter(array_test, asm_output, &kstate, size);
@@ -421,22 +406,13 @@ int main(void)
 		avg_c(c_diff, size, &asm_diffavg);
 		conv_c(array_test, asm_output, asm_conv, size);
 		corr_c(array_test, asm_output, asm_corr, size);
-
-
-
-/*
-	  for(int i = 0; i<5; i++){
-		  measurement = i;
-		  kalman(&msg, measurement);
-	  }
-	  */
-
-	 // kalman(&msg, &measurement);
+		ITM_Port32(31) = 7;
 
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
+
 
 /**
   * @brief System Clock Configuration
@@ -484,6 +460,51 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 40000;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 3000;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
 }
 
 /**

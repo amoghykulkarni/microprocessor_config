@@ -29,6 +29,7 @@
  * Humidity Sensor
  * Accelerometer Sensor
  * Gyroscope Sensor
+ * Pressure Sensor
  */
 #include "hts221.h"
 #include "lsm6dsl.h"
@@ -54,9 +55,9 @@
 //#define PART1
 #define PART2
 #define size 35
-#define buffSize 100
+#define buffSize 200
 #define OSDELAY 1000
-#define OSDELAY2 250
+#define OSDELAY2 25000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -110,7 +111,6 @@ void ReadSensorDataTask(void const * argument);
 #ifdef PART1
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-
 		if(state%4 == 0){
 			sprintf(hSensor_buffer, "\n Humidity Value: %d\r", (int)hValue);
 			HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, strlen(hSensor_buffer), HAL_UART_TIMEOUT_VALUE);
@@ -223,7 +223,7 @@ int main(void)
 	  tValue = BSP_TSENSOR_ReadTemp();
 	  psensor = BSP_PSENSOR_ReadPressure();
 	  BSP_ACCELERO_AccGetXYZ(accelero);
-	  HAL_Delay(100);
+	  HAL_Delay(99);
 #endif
 
   }

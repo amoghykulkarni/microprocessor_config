@@ -50,13 +50,13 @@ Common symbol       size              file
 
 hDiscoUart          0x8c              Core/Src/stm32l4s5i_iot01.o
 errno               0x4               /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.macos64_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/7.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libc_nano.a(lib_a-reent.o)
-gyro_buffer         0x64              Core/Src/main.o
+gyro_buffer         0xc8              Core/Src/main.o
 hi2c2               0x4c              Core/Src/main.o
-accelero_buffer     0x64              Core/Src/main.o
+accelero_buffer     0xc8              Core/Src/main.o
 uwTick              0x4               Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o
 xQueueRegistry      0x40              Middlewares/Third_Party/FreeRTOS/Source/queue.o
-hSensor_buffer      0x64              Core/Src/main.o
-tSensor_buffer      0x64              Core/Src/main.o
+hSensor_buffer      0xc8              Core/Src/main.o
+tSensor_buffer      0xc8              Core/Src/main.o
 tValue              0x4               Core/Src/main.o
 gyro                0xc               Core/Src/main.o
 huart1              0x8c              Core/Src/main.o
@@ -64,10 +64,10 @@ transmitDataHandle  0x4               Core/Src/main.o
 hI2cHandler         0x4c              Core/Src/stm32l4s5i_iot01.o
 checkButtonHandle   0x4               Core/Src/main.o
 htim6               0x4c              Core/Src/stm32l4xx_hal_timebase_tim.o
-pressure_buff       0x64              Core/Src/main.o
-msgBuff             0x64              Core/Src/main.o
+pressure_buff       0xc8              Core/Src/main.o
+msgBuff             0xc8              Core/Src/main.o
 hValue              0x4               Core/Src/main.o
-msgBuff2            0x64              Core/Src/main.o
+msgBuff2            0xc8              Core/Src/main.o
 psensor             0x4               Core/Src/main.o
 accelero            0x6               Core/Src/main.o
 readSensorDataHandle
@@ -6181,7 +6181,7 @@ LOAD /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.id
  .igot.plt      0x00000000200000d0        0x0 /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.macos64_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/7.3.1/thumb/v7e-m/fpv4-sp/hard/crtbegin.o
                 0x00000000200000d0                . = ALIGN (0x4)
 
-.bss            0x00000000200000d0     0x1480 load address 0x0000000008007a28
+.bss            0x00000000200000d0     0x173c load address 0x0000000008007a28
                 0x00000000200000d0                _sbss = .
                 0x00000000200000d0                __bss_start__ = _sbss
  *(.bss)
@@ -6268,47 +6268,48 @@ LOAD /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.id
                 0x0000000020001060        0x4 /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.macos64_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/7.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libc_nano.a(lib_a-nano-mallocr.o)
                 0x0000000020001060                __malloc_sbrk_start
  *(COMMON)
- COMMON         0x0000000020001064      0x3c0 Core/Src/main.o
+ COMMON         0x0000000020001064      0x67c Core/Src/main.o
                 0x0000000020001064                gyro_buffer
-                0x00000000200010c8                hi2c2
-                0x0000000020001114                accelero_buffer
-                0x0000000020001178                hSensor_buffer
-                0x00000000200011dc                tSensor_buffer
-                0x0000000020001240                tValue
-                0x0000000020001244                gyro
-                0x0000000020001250                huart1
-                0x00000000200012dc                transmitDataHandle
-                0x00000000200012e0                checkButtonHandle
-                0x00000000200012e4                pressure_buff
-                0x0000000020001348                msgBuff
-                0x00000000200013ac                hValue
-                0x00000000200013b0                msgBuff2
-                0x0000000020001414                psensor
-                0x0000000020001418                accelero
-                0x0000000020001420                readSensorDataHandle
- COMMON         0x0000000020001424       0xd8 Core/Src/stm32l4s5i_iot01.o
-                0x0000000020001424                hDiscoUart
-                0x00000000200014b0                hI2cHandler
- COMMON         0x00000000200014fc       0x4c Core/Src/stm32l4xx_hal_timebase_tim.o
-                0x00000000200014fc                htim6
- COMMON         0x0000000020001548        0x4 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o
-                0x0000000020001548                uwTick
- COMMON         0x000000002000154c        0x4 /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.macos64_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/7.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libc_nano.a(lib_a-reent.o)
-                0x000000002000154c                errno
-                0x0000000020001550                . = ALIGN (0x4)
-                0x0000000020001550                _ebss = .
-                0x0000000020001550                __bss_end__ = _ebss
+                0x000000002000112c                hi2c2
+                0x0000000020001178                accelero_buffer
+                0x0000000020001240                hSensor_buffer
+                0x0000000020001308                tSensor_buffer
+                0x00000000200013d0                tValue
+                0x00000000200013d4                gyro
+                0x00000000200013e0                huart1
+                0x000000002000146c                transmitDataHandle
+                0x0000000020001470                checkButtonHandle
+                0x0000000020001474                pressure_buff
+                0x000000002000153c                msgBuff
+                0x0000000020001604                hValue
+                0x0000000020001608                msgBuff2
+                0x00000000200016d0                psensor
+                0x00000000200016d4                accelero
+                0x00000000200016dc                readSensorDataHandle
+ COMMON         0x00000000200016e0       0xd8 Core/Src/stm32l4s5i_iot01.o
+                0x00000000200016e0                hDiscoUart
+                0x000000002000176c                hI2cHandler
+ COMMON         0x00000000200017b8       0x4c Core/Src/stm32l4xx_hal_timebase_tim.o
+                0x00000000200017b8                htim6
+ COMMON         0x0000000020001804        0x4 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o
+                0x0000000020001804                uwTick
+ COMMON         0x0000000020001808        0x4 /Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.macos64_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/7.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard/libc_nano.a(lib_a-reent.o)
+                0x0000000020001808                errno
+                0x000000002000180c                . = ALIGN (0x4)
+                0x000000002000180c                _ebss = .
+                0x000000002000180c                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x0000000020001550      0x600 load address 0x0000000008007a28
-                0x0000000020001550                . = ALIGN (0x8)
+                0x000000002000180c      0x604 load address 0x0000000008007a28
+                0x0000000020001810                . = ALIGN (0x8)
+ *fill*         0x000000002000180c        0x4 
                 [!provide]                        PROVIDE (end = .)
-                0x0000000020001550                PROVIDE (_end = .)
-                0x0000000020001750                . = (. + _Min_Heap_Size)
- *fill*         0x0000000020001550      0x200 
-                0x0000000020001b50                . = (. + _Min_Stack_Size)
- *fill*         0x0000000020001750      0x400 
-                0x0000000020001b50                . = ALIGN (0x8)
+                0x0000000020001810                PROVIDE (_end = .)
+                0x0000000020001a10                . = (. + _Min_Heap_Size)
+ *fill*         0x0000000020001810      0x200 
+                0x0000000020001e10                . = (. + _Min_Stack_Size)
+ *fill*         0x0000000020001a10      0x400 
+                0x0000000020001e10                . = ALIGN (0x8)
 
 /DISCARD/
  libc.a(*)
@@ -6733,42 +6734,42 @@ OUTPUT(ECSE444_Lab4.elf elf32-littlearm)
  .debug_macro   0x000000000002e600      0x196 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
  .debug_macro   0x000000000002e796      0x1a1 Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
-.debug_line     0x0000000000000000    0x16506
+.debug_line     0x0000000000000000    0x16505
  .debug_line    0x0000000000000000      0x837 Core/Src/freertos.o
  .debug_line    0x0000000000000837      0x470 Core/Src/hts221.o
  .debug_line    0x0000000000000ca7      0x48d Core/Src/lps22hb.o
  .debug_line    0x0000000000001134      0x51a Core/Src/lsm6dsl.o
- .debug_line    0x000000000000164e      0xd07 Core/Src/main.o
- .debug_line    0x0000000000002355      0xa34 Core/Src/stm32l4s5i_iot01.o
- .debug_line    0x0000000000002d89      0x7dd Core/Src/stm32l4s5i_iot01_accelero.o
- .debug_line    0x0000000000003566      0x7bb Core/Src/stm32l4s5i_iot01_hsensor.o
- .debug_line    0x0000000000003d21      0x7bc Core/Src/stm32l4s5i_iot01_psensor.o
- .debug_line    0x00000000000044dd      0x7a9 Core/Src/stm32l4s5i_iot01_tsensor.o
- .debug_line    0x0000000000004c86      0x79d Core/Src/stm32l4xx_hal_msp.o
- .debug_line    0x0000000000005423      0x771 Core/Src/stm32l4xx_hal_timebase_tim.o
- .debug_line    0x0000000000005b94      0x7d5 Core/Src/stm32l4xx_it.o
- .debug_line    0x0000000000006369      0x503 Core/Src/sysmem.o
- .debug_line    0x000000000000686c      0x768 Core/Src/system_stm32l4xx.o
- .debug_line    0x0000000000006fd4       0x87 Core/Startup/startup_stm32l4s5vitx.o
- .debug_line    0x000000000000705b      0x9de Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o
- .debug_line    0x0000000000007a39      0xa66 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_cortex.o
- .debug_line    0x000000000000849f      0x909 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.o
- .debug_line    0x0000000000008da8     0x1b20 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.o
- .debug_line    0x000000000000a8c8      0x881 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.o
- .debug_line    0x000000000000b149      0xb58 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.o
- .debug_line    0x000000000000bca1      0xa96 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.o
- .debug_line    0x000000000000c737      0xee1 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.o
- .debug_line    0x000000000000d618     0x27fe Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.o
- .debug_line    0x000000000000fe16     0x15ce Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.o
- .debug_line    0x00000000000113e4     0x1402 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.o
- .debug_line    0x00000000000127e6      0x9ac Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.o
- .debug_line    0x0000000000013192      0xcfc Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o
- .debug_line    0x0000000000013e8e      0x6a8 Middlewares/Third_Party/FreeRTOS/Source/list.o
- .debug_line    0x0000000000014536     0x116f Middlewares/Third_Party/FreeRTOS/Source/tasks.o
- .debug_line    0x00000000000156a5      0x6d3 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
- .debug_line    0x0000000000015d78      0x78e Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
+ .debug_line    0x000000000000164e      0xd06 Core/Src/main.o
+ .debug_line    0x0000000000002354      0xa34 Core/Src/stm32l4s5i_iot01.o
+ .debug_line    0x0000000000002d88      0x7dd Core/Src/stm32l4s5i_iot01_accelero.o
+ .debug_line    0x0000000000003565      0x7bb Core/Src/stm32l4s5i_iot01_hsensor.o
+ .debug_line    0x0000000000003d20      0x7bc Core/Src/stm32l4s5i_iot01_psensor.o
+ .debug_line    0x00000000000044dc      0x7a9 Core/Src/stm32l4s5i_iot01_tsensor.o
+ .debug_line    0x0000000000004c85      0x79d Core/Src/stm32l4xx_hal_msp.o
+ .debug_line    0x0000000000005422      0x771 Core/Src/stm32l4xx_hal_timebase_tim.o
+ .debug_line    0x0000000000005b93      0x7d5 Core/Src/stm32l4xx_it.o
+ .debug_line    0x0000000000006368      0x503 Core/Src/sysmem.o
+ .debug_line    0x000000000000686b      0x768 Core/Src/system_stm32l4xx.o
+ .debug_line    0x0000000000006fd3       0x87 Core/Startup/startup_stm32l4s5vitx.o
+ .debug_line    0x000000000000705a      0x9de Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o
+ .debug_line    0x0000000000007a38      0xa66 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_cortex.o
+ .debug_line    0x000000000000849e      0x909 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.o
+ .debug_line    0x0000000000008da7     0x1b20 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.o
+ .debug_line    0x000000000000a8c7      0x881 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.o
+ .debug_line    0x000000000000b148      0xb58 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.o
+ .debug_line    0x000000000000bca0      0xa96 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.o
+ .debug_line    0x000000000000c736      0xee1 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.o
+ .debug_line    0x000000000000d617     0x27fe Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.o
+ .debug_line    0x000000000000fe15     0x15ce Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.o
+ .debug_line    0x00000000000113e3     0x1402 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.o
+ .debug_line    0x00000000000127e5      0x9ac Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.o
+ .debug_line    0x0000000000013191      0xcfc Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o
+ .debug_line    0x0000000000013e8d      0x6a8 Middlewares/Third_Party/FreeRTOS/Source/list.o
+ .debug_line    0x0000000000014535     0x116f Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_line    0x00000000000156a4      0x6d3 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
+ .debug_line    0x0000000000015d77      0x78e Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
 
-.debug_str      0x0000000000000000   0x1197a8
+.debug_str      0x0000000000000000   0x1197aa
  .debug_str     0x0000000000000000   0x10657a Core/Src/freertos.o
                                      0x10686c (size before relaxing)
  .debug_str     0x000000000010657a      0x839 Core/Src/hts221.o
@@ -6777,63 +6778,63 @@ OUTPUT(ECSE444_Lab4.elf elf32-littlearm)
                                        0x4a87 (size before relaxing)
  .debug_str     0x0000000000107af5     0x1821 Core/Src/lsm6dsl.o
                                        0x5485 (size before relaxing)
- .debug_str     0x0000000000109316     0x86da Core/Src/main.o
-                                     0x111d4c (size before relaxing)
- .debug_str     0x00000000001119f0      0x533 Core/Src/stm32l4s5i_iot01.o
+ .debug_str     0x0000000000109316     0x86dc Core/Src/main.o
+                                     0x111d4e (size before relaxing)
+ .debug_str     0x00000000001119f2      0x533 Core/Src/stm32l4s5i_iot01.o
                                      0x104af7 (size before relaxing)
- .debug_str     0x0000000000111f23      0x17a Core/Src/stm32l4s5i_iot01_accelero.o
+ .debug_str     0x0000000000111f25      0x17a Core/Src/stm32l4s5i_iot01_accelero.o
                                      0x104feb (size before relaxing)
- .debug_str     0x000000000011209d       0x89 Core/Src/stm32l4s5i_iot01_hsensor.o
+ .debug_str     0x000000000011209f       0x89 Core/Src/stm32l4s5i_iot01_hsensor.o
                                      0x103f08 (size before relaxing)
- .debug_str     0x0000000000112126       0x89 Core/Src/stm32l4s5i_iot01_psensor.o
+ .debug_str     0x0000000000112128       0x89 Core/Src/stm32l4s5i_iot01_psensor.o
                                      0x10452a (size before relaxing)
- .debug_str     0x00000000001121af       0x72 Core/Src/stm32l4s5i_iot01_tsensor.o
+ .debug_str     0x00000000001121b1       0x72 Core/Src/stm32l4s5i_iot01_tsensor.o
                                      0x103ef1 (size before relaxing)
- .debug_str     0x0000000000112221       0x77 Core/Src/stm32l4xx_hal_msp.o
+ .debug_str     0x0000000000112223       0x77 Core/Src/stm32l4xx_hal_msp.o
                                      0x1038e0 (size before relaxing)
- .debug_str     0x0000000000112298       0x98 Core/Src/stm32l4xx_hal_timebase_tim.o
+ .debug_str     0x000000000011229a       0x98 Core/Src/stm32l4xx_hal_timebase_tim.o
                                      0x10371f (size before relaxing)
- .debug_str     0x0000000000112330       0xa7 Core/Src/stm32l4xx_it.o
+ .debug_str     0x0000000000112332       0xa7 Core/Src/stm32l4xx_it.o
                                      0x103063 (size before relaxing)
- .debug_str     0x00000000001123d7      0x369 Core/Src/sysmem.o
+ .debug_str     0x00000000001123d9      0x369 Core/Src/sysmem.o
                                        0x5f66 (size before relaxing)
- .debug_str     0x0000000000112740       0xcd Core/Src/system_stm32l4xx.o
+ .debug_str     0x0000000000112742       0xcd Core/Src/system_stm32l4xx.o
                                      0x102bdd (size before relaxing)
- .debug_str     0x000000000011280d       0x36 Core/Startup/startup_stm32l4s5vitx.o
+ .debug_str     0x000000000011280f       0x36 Core/Startup/startup_stm32l4s5vitx.o
                                          0x73 (size before relaxing)
- .debug_str     0x0000000000112843      0x571 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o
+ .debug_str     0x0000000000112845      0x571 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o
                                      0x10370c (size before relaxing)
- .debug_str     0x0000000000112db4      0x376 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_cortex.o
+ .debug_str     0x0000000000112db6      0x376 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_cortex.o
                                      0x103457 (size before relaxing)
- .debug_str     0x000000000011312a      0x236 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.o
+ .debug_str     0x000000000011312c      0x236 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.o
                                      0x102e49 (size before relaxing)
- .debug_str     0x0000000000113360      0xd28 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.o
+ .debug_str     0x0000000000113362      0xd28 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.o
                                      0x103db6 (size before relaxing)
- .debug_str     0x0000000000114088       0xb8 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.o
+ .debug_str     0x000000000011408a       0xb8 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.o
                                      0x1031d3 (size before relaxing)
- .debug_str     0x0000000000114140      0x581 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.o
+ .debug_str     0x0000000000114142      0x581 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.o
                                      0x1031ab (size before relaxing)
- .debug_str     0x00000000001146c1      0x3c6 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.o
+ .debug_str     0x00000000001146c3      0x3c6 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.o
                                      0x1031b8 (size before relaxing)
- .debug_str     0x0000000000114a87      0x59a Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.o
+ .debug_str     0x0000000000114a89      0x59a Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.o
                                      0x103591 (size before relaxing)
- .debug_str     0x0000000000115021      0xe4a Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.o
+ .debug_str     0x0000000000115023      0xe4a Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.o
                                      0x103f2d (size before relaxing)
- .debug_str     0x0000000000115e6b      0x684 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.o
+ .debug_str     0x0000000000115e6d      0x684 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.o
                                      0x103821 (size before relaxing)
- .debug_str     0x00000000001164ef      0x8fe Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.o
+ .debug_str     0x00000000001164f1      0x8fe Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.o
                                      0x10398a (size before relaxing)
- .debug_str     0x0000000000116ded      0x286 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.o
+ .debug_str     0x0000000000116def      0x286 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.o
                                      0x10319f (size before relaxing)
- .debug_str     0x0000000000117073      0x8bc Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o
+ .debug_str     0x0000000000117075      0x8bc Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o
                                        0xe1fc (size before relaxing)
- .debug_str     0x000000000011792f      0x219 Middlewares/Third_Party/FreeRTOS/Source/list.o
+ .debug_str     0x0000000000117931      0x219 Middlewares/Third_Party/FreeRTOS/Source/list.o
                                        0xa76c (size before relaxing)
- .debug_str     0x0000000000117b48     0x1203 Middlewares/Third_Party/FreeRTOS/Source/tasks.o
+ .debug_str     0x0000000000117b4a     0x1203 Middlewares/Third_Party/FreeRTOS/Source/tasks.o
                                        0xc98d (size before relaxing)
- .debug_str     0x0000000000118d4b      0x803 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
+ .debug_str     0x0000000000118d4d      0x803 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o
                                        0x8535 (size before relaxing)
- .debug_str     0x000000000011954e      0x25a Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
+ .debug_str     0x0000000000119550      0x25a Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o
                                        0xaf5f (size before relaxing)
 
 .comment        0x0000000000000000       0x7b

@@ -28,8 +28,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
- ../Core/Inc/kalman.h ../Core/Inc/arm_math.h \
- ../Drivers/CMSIS/Include/cmsis_compiler.h
+ ../Core/Inc/arm_math.h ../Drivers/CMSIS/Include/cmsis_compiler.h \
+ ../Core/Inc/kalman.h
 
 ../Core/Inc/main.h:
 
@@ -91,8 +91,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
 
-../Core/Inc/kalman.h:
-
 ../Core/Inc/arm_math.h:
 
 ../Drivers/CMSIS/Include/cmsis_compiler.h:
+
+../Core/Inc/kalman.h:

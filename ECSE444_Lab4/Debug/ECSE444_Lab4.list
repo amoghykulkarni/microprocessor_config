@@ -21,9 +21,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, DATA
   8 .data         000000d0  20000000  08007958  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          00001480  200000d0  08007a28  000200d0  2**2
+  9 .bss          0000173c  200000d0  08007a28  000200d0  2**2
                   ALLOC
- 10 ._user_heap_stack 00000600  20001550  08007a28  00021550  2**0
+ 10 ._user_heap_stack 00000604  2000180c  08007a28  0002180c  2**0
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  000200d0  2**0
                   CONTENTS, READONLY
@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  16 .debug_macro  0002e937  00000000  00000000  00046770  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_line   00016506  00000000  00000000  000750a7  2**0
+ 17 .debug_line   00016505  00000000  00000000  000750a7  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    001197a8  00000000  00000000  0008b5ad  2**0
+ 18 .debug_str    001197aa  00000000  00000000  0008b5ac  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  001a4d55  2**0
+ 19 .comment      0000007b  00000000  00000000  001a4d56  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00006d08  00000000  00000000  001a4dd0  2**2
+ 20 .debug_frame  00006d08  00000000  00000000  001a4dd4  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -1659,11 +1659,11 @@ int main(void)
  8000d5c:	e7fe      	b.n	8000d5c <main+0x9c>
  8000d5e:	bf00      	nop
  8000d60:	08007768 	.word	0x08007768
- 8000d64:	200012e0 	.word	0x200012e0
+ 8000d64:	20001470 	.word	0x20001470
  8000d68:	08007794 	.word	0x08007794
- 8000d6c:	200012dc 	.word	0x200012dc
+ 8000d6c:	2000146c 	.word	0x2000146c
  8000d70:	080077c0 	.word	0x080077c0
- 8000d74:	20001420 	.word	0x20001420
+ 8000d74:	200016dc 	.word	0x200016dc
 
 08000d78 <SystemClock_Config>:
 /**
@@ -1907,7 +1907,7 @@ static void MX_I2C2_Init(void)
  8000eda:	bf00      	nop
  8000edc:	bd80      	pop	{r7, pc}
  8000ede:	bf00      	nop
- 8000ee0:	200010c8 	.word	0x200010c8
+ 8000ee0:	2000112c 	.word	0x2000112c
  8000ee4:	40005800 	.word	0x40005800
  8000ee8:	10909cec 	.word	0x10909cec
 
@@ -2018,7 +2018,7 @@ static void MX_USART1_UART_Init(void)
 }
  8000f78:	bf00      	nop
  8000f7a:	bd80      	pop	{r7, pc}
- 8000f7c:	20001250 	.word	0x20001250
+ 8000f7c:	200013e0 	.word	0x200013e0
  8000f80:	40013800 	.word	0x40013800
 
 08000f84 <MX_GPIO_Init>:
@@ -2186,8 +2186,8 @@ void ButtonPressedTask(void const * argument)
  8001098:	48000800 	.word	0x48000800
  800109c:	20000340 	.word	0x20000340
  80010a0:	080077dc 	.word	0x080077dc
- 80010a4:	20001348 	.word	0x20001348
- 80010a8:	20001250 	.word	0x20001250
+ 80010a4:	2000153c 	.word	0x2000153c
+ 80010a8:	200013e0 	.word	0x200013e0
 
 080010ac <TransmitDataTask>:
 * @param argument: Not used
@@ -2205,161 +2205,160 @@ void TransmitDataTask(void const * argument)
 	for(;;)
 	{
 		osDelay(OSDELAY2);
- 80010b4:	20fa      	movs	r0, #250	; 0xfa
- 80010b6:	f004 fd52 	bl	8005b5e <osDelay>
+ 80010b4:	f246 10a8 	movw	r0, #25000	; 0x61a8
+ 80010b8:	f004 fd51 	bl	8005b5e <osDelay>
 		if(state == 0){
- 80010ba:	4b48      	ldr	r3, [pc, #288]	; (80011dc <TransmitDataTask+0x130>)
- 80010bc:	781b      	ldrb	r3, [r3, #0]
- 80010be:	2b00      	cmp	r3, #0
- 80010c0:	d120      	bne.n	8001104 <TransmitDataTask+0x58>
+ 80010bc:	4b47      	ldr	r3, [pc, #284]	; (80011dc <TransmitDataTask+0x130>)
+ 80010be:	781b      	ldrb	r3, [r3, #0]
+ 80010c0:	2b00      	cmp	r3, #0
+ 80010c2:	d120      	bne.n	8001106 <TransmitDataTask+0x5a>
 			hValue = BSP_HSENSOR_ReadHumidity();
- 80010c2:	f000 fb19 	bl	80016f8 <BSP_HSENSOR_ReadHumidity>
- 80010c6:	eef0 7a40 	vmov.f32	s15, s0
- 80010ca:	4b45      	ldr	r3, [pc, #276]	; (80011e0 <TransmitDataTask+0x134>)
- 80010cc:	edc3 7a00 	vstr	s15, [r3]
+ 80010c4:	f000 fb18 	bl	80016f8 <BSP_HSENSOR_ReadHumidity>
+ 80010c8:	eef0 7a40 	vmov.f32	s15, s0
+ 80010cc:	4b44      	ldr	r3, [pc, #272]	; (80011e0 <TransmitDataTask+0x134>)
+ 80010ce:	edc3 7a00 	vstr	s15, [r3]
 			sprintf(msgBuff2, "\n Transmitting...\r");
- 80010d0:	4a44      	ldr	r2, [pc, #272]	; (80011e4 <TransmitDataTask+0x138>)
- 80010d2:	4b45      	ldr	r3, [pc, #276]	; (80011e8 <TransmitDataTask+0x13c>)
- 80010d4:	4615      	mov	r5, r2
- 80010d6:	461c      	mov	r4, r3
- 80010d8:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
- 80010da:	6028      	str	r0, [r5, #0]
- 80010dc:	6069      	str	r1, [r5, #4]
- 80010de:	60aa      	str	r2, [r5, #8]
- 80010e0:	60eb      	str	r3, [r5, #12]
- 80010e2:	8823      	ldrh	r3, [r4, #0]
- 80010e4:	78a2      	ldrb	r2, [r4, #2]
- 80010e6:	822b      	strh	r3, [r5, #16]
- 80010e8:	4613      	mov	r3, r2
- 80010ea:	74ab      	strb	r3, [r5, #18]
+ 80010d2:	4a44      	ldr	r2, [pc, #272]	; (80011e4 <TransmitDataTask+0x138>)
+ 80010d4:	4b44      	ldr	r3, [pc, #272]	; (80011e8 <TransmitDataTask+0x13c>)
+ 80010d6:	4615      	mov	r5, r2
+ 80010d8:	461c      	mov	r4, r3
+ 80010da:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
+ 80010dc:	6028      	str	r0, [r5, #0]
+ 80010de:	6069      	str	r1, [r5, #4]
+ 80010e0:	60aa      	str	r2, [r5, #8]
+ 80010e2:	60eb      	str	r3, [r5, #12]
+ 80010e4:	8823      	ldrh	r3, [r4, #0]
+ 80010e6:	78a2      	ldrb	r2, [r4, #2]
+ 80010e8:	822b      	strh	r3, [r5, #16]
+ 80010ea:	4613      	mov	r3, r2
+ 80010ec:	74ab      	strb	r3, [r5, #18]
 			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
- 80010ec:	483d      	ldr	r0, [pc, #244]	; (80011e4 <TransmitDataTask+0x138>)
- 80010ee:	f7ff f887 	bl	8000200 <strlen>
- 80010f2:	4603      	mov	r3, r0
- 80010f4:	b29a      	uxth	r2, r3
- 80010f6:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 80010fa:	493a      	ldr	r1, [pc, #232]	; (80011e4 <TransmitDataTask+0x138>)
- 80010fc:	483b      	ldr	r0, [pc, #236]	; (80011ec <TransmitDataTask+0x140>)
- 80010fe:	f003 fed1 	bl	8004ea4 <HAL_UART_Transmit>
- 8001102:	e7d7      	b.n	80010b4 <TransmitDataTask+0x8>
+ 80010ee:	483d      	ldr	r0, [pc, #244]	; (80011e4 <TransmitDataTask+0x138>)
+ 80010f0:	f7ff f886 	bl	8000200 <strlen>
+ 80010f4:	4603      	mov	r3, r0
+ 80010f6:	b29a      	uxth	r2, r3
+ 80010f8:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 80010fc:	4939      	ldr	r1, [pc, #228]	; (80011e4 <TransmitDataTask+0x138>)
+ 80010fe:	483b      	ldr	r0, [pc, #236]	; (80011ec <TransmitDataTask+0x140>)
+ 8001100:	f003 fed0 	bl	8004ea4 <HAL_UART_Transmit>
+ 8001104:	e7d6      	b.n	80010b4 <TransmitDataTask+0x8>
 		}
 		else if(state == 1){
- 8001104:	4b35      	ldr	r3, [pc, #212]	; (80011dc <TransmitDataTask+0x130>)
- 8001106:	781b      	ldrb	r3, [r3, #0]
- 8001108:	2b01      	cmp	r3, #1
- 800110a:	d120      	bne.n	800114e <TransmitDataTask+0xa2>
+ 8001106:	4b35      	ldr	r3, [pc, #212]	; (80011dc <TransmitDataTask+0x130>)
+ 8001108:	781b      	ldrb	r3, [r3, #0]
+ 800110a:	2b01      	cmp	r3, #1
+ 800110c:	d120      	bne.n	8001150 <TransmitDataTask+0xa4>
 			tValue = BSP_TSENSOR_ReadTemp();
- 800110c:	f000 fb4c 	bl	80017a8 <BSP_TSENSOR_ReadTemp>
- 8001110:	eef0 7a40 	vmov.f32	s15, s0
- 8001114:	4b36      	ldr	r3, [pc, #216]	; (80011f0 <TransmitDataTask+0x144>)
- 8001116:	edc3 7a00 	vstr	s15, [r3]
+ 800110e:	f000 fb4b 	bl	80017a8 <BSP_TSENSOR_ReadTemp>
+ 8001112:	eef0 7a40 	vmov.f32	s15, s0
+ 8001116:	4b36      	ldr	r3, [pc, #216]	; (80011f0 <TransmitDataTask+0x144>)
+ 8001118:	edc3 7a00 	vstr	s15, [r3]
 			sprintf(msgBuff2, "\n Transmitting...\r");
- 800111a:	4a32      	ldr	r2, [pc, #200]	; (80011e4 <TransmitDataTask+0x138>)
- 800111c:	4b32      	ldr	r3, [pc, #200]	; (80011e8 <TransmitDataTask+0x13c>)
- 800111e:	4615      	mov	r5, r2
- 8001120:	461c      	mov	r4, r3
- 8001122:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
- 8001124:	6028      	str	r0, [r5, #0]
- 8001126:	6069      	str	r1, [r5, #4]
- 8001128:	60aa      	str	r2, [r5, #8]
- 800112a:	60eb      	str	r3, [r5, #12]
- 800112c:	8823      	ldrh	r3, [r4, #0]
- 800112e:	78a2      	ldrb	r2, [r4, #2]
- 8001130:	822b      	strh	r3, [r5, #16]
- 8001132:	4613      	mov	r3, r2
- 8001134:	74ab      	strb	r3, [r5, #18]
+ 800111c:	4a31      	ldr	r2, [pc, #196]	; (80011e4 <TransmitDataTask+0x138>)
+ 800111e:	4b32      	ldr	r3, [pc, #200]	; (80011e8 <TransmitDataTask+0x13c>)
+ 8001120:	4615      	mov	r5, r2
+ 8001122:	461c      	mov	r4, r3
+ 8001124:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
+ 8001126:	6028      	str	r0, [r5, #0]
+ 8001128:	6069      	str	r1, [r5, #4]
+ 800112a:	60aa      	str	r2, [r5, #8]
+ 800112c:	60eb      	str	r3, [r5, #12]
+ 800112e:	8823      	ldrh	r3, [r4, #0]
+ 8001130:	78a2      	ldrb	r2, [r4, #2]
+ 8001132:	822b      	strh	r3, [r5, #16]
+ 8001134:	4613      	mov	r3, r2
+ 8001136:	74ab      	strb	r3, [r5, #18]
 			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
- 8001136:	482b      	ldr	r0, [pc, #172]	; (80011e4 <TransmitDataTask+0x138>)
- 8001138:	f7ff f862 	bl	8000200 <strlen>
- 800113c:	4603      	mov	r3, r0
- 800113e:	b29a      	uxth	r2, r3
- 8001140:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 8001144:	4927      	ldr	r1, [pc, #156]	; (80011e4 <TransmitDataTask+0x138>)
- 8001146:	4829      	ldr	r0, [pc, #164]	; (80011ec <TransmitDataTask+0x140>)
- 8001148:	f003 feac 	bl	8004ea4 <HAL_UART_Transmit>
- 800114c:	e7b2      	b.n	80010b4 <TransmitDataTask+0x8>
+ 8001138:	482a      	ldr	r0, [pc, #168]	; (80011e4 <TransmitDataTask+0x138>)
+ 800113a:	f7ff f861 	bl	8000200 <strlen>
+ 800113e:	4603      	mov	r3, r0
+ 8001140:	b29a      	uxth	r2, r3
+ 8001142:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 8001146:	4927      	ldr	r1, [pc, #156]	; (80011e4 <TransmitDataTask+0x138>)
+ 8001148:	4828      	ldr	r0, [pc, #160]	; (80011ec <TransmitDataTask+0x140>)
+ 800114a:	f003 feab 	bl	8004ea4 <HAL_UART_Transmit>
+ 800114e:	e7b1      	b.n	80010b4 <TransmitDataTask+0x8>
 
 		}
 		else if(state == 2){
- 800114e:	4b23      	ldr	r3, [pc, #140]	; (80011dc <TransmitDataTask+0x130>)
- 8001150:	781b      	ldrb	r3, [r3, #0]
- 8001152:	2b02      	cmp	r3, #2
- 8001154:	d11c      	bne.n	8001190 <TransmitDataTask+0xe4>
+ 8001150:	4b22      	ldr	r3, [pc, #136]	; (80011dc <TransmitDataTask+0x130>)
+ 8001152:	781b      	ldrb	r3, [r3, #0]
+ 8001154:	2b02      	cmp	r3, #2
+ 8001156:	d11c      	bne.n	8001192 <TransmitDataTask+0xe6>
 			BSP_ACCELERO_AccGetXYZ(accelero);
- 8001156:	4827      	ldr	r0, [pc, #156]	; (80011f4 <TransmitDataTask+0x148>)
- 8001158:	f000 fa96 	bl	8001688 <BSP_ACCELERO_AccGetXYZ>
+ 8001158:	4826      	ldr	r0, [pc, #152]	; (80011f4 <TransmitDataTask+0x148>)
+ 800115a:	f000 fa95 	bl	8001688 <BSP_ACCELERO_AccGetXYZ>
 			sprintf(msgBuff2, "\n Transmitting...\r");
- 800115c:	4a21      	ldr	r2, [pc, #132]	; (80011e4 <TransmitDataTask+0x138>)
- 800115e:	4b22      	ldr	r3, [pc, #136]	; (80011e8 <TransmitDataTask+0x13c>)
- 8001160:	4615      	mov	r5, r2
- 8001162:	461c      	mov	r4, r3
- 8001164:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
- 8001166:	6028      	str	r0, [r5, #0]
- 8001168:	6069      	str	r1, [r5, #4]
- 800116a:	60aa      	str	r2, [r5, #8]
- 800116c:	60eb      	str	r3, [r5, #12]
- 800116e:	8823      	ldrh	r3, [r4, #0]
- 8001170:	78a2      	ldrb	r2, [r4, #2]
- 8001172:	822b      	strh	r3, [r5, #16]
- 8001174:	4613      	mov	r3, r2
- 8001176:	74ab      	strb	r3, [r5, #18]
+ 800115e:	4a21      	ldr	r2, [pc, #132]	; (80011e4 <TransmitDataTask+0x138>)
+ 8001160:	4b21      	ldr	r3, [pc, #132]	; (80011e8 <TransmitDataTask+0x13c>)
+ 8001162:	4615      	mov	r5, r2
+ 8001164:	461c      	mov	r4, r3
+ 8001166:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
+ 8001168:	6028      	str	r0, [r5, #0]
+ 800116a:	6069      	str	r1, [r5, #4]
+ 800116c:	60aa      	str	r2, [r5, #8]
+ 800116e:	60eb      	str	r3, [r5, #12]
+ 8001170:	8823      	ldrh	r3, [r4, #0]
+ 8001172:	78a2      	ldrb	r2, [r4, #2]
+ 8001174:	822b      	strh	r3, [r5, #16]
+ 8001176:	4613      	mov	r3, r2
+ 8001178:	74ab      	strb	r3, [r5, #18]
 			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
- 8001178:	481a      	ldr	r0, [pc, #104]	; (80011e4 <TransmitDataTask+0x138>)
- 800117a:	f7ff f841 	bl	8000200 <strlen>
- 800117e:	4603      	mov	r3, r0
- 8001180:	b29a      	uxth	r2, r3
- 8001182:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 8001186:	4917      	ldr	r1, [pc, #92]	; (80011e4 <TransmitDataTask+0x138>)
- 8001188:	4818      	ldr	r0, [pc, #96]	; (80011ec <TransmitDataTask+0x140>)
- 800118a:	f003 fe8b 	bl	8004ea4 <HAL_UART_Transmit>
- 800118e:	e791      	b.n	80010b4 <TransmitDataTask+0x8>
+ 800117a:	481a      	ldr	r0, [pc, #104]	; (80011e4 <TransmitDataTask+0x138>)
+ 800117c:	f7ff f840 	bl	8000200 <strlen>
+ 8001180:	4603      	mov	r3, r0
+ 8001182:	b29a      	uxth	r2, r3
+ 8001184:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 8001188:	4916      	ldr	r1, [pc, #88]	; (80011e4 <TransmitDataTask+0x138>)
+ 800118a:	4818      	ldr	r0, [pc, #96]	; (80011ec <TransmitDataTask+0x140>)
+ 800118c:	f003 fe8a 	bl	8004ea4 <HAL_UART_Transmit>
+ 8001190:	e790      	b.n	80010b4 <TransmitDataTask+0x8>
 
 		}
 		else if(state == 3){
- 8001190:	4b12      	ldr	r3, [pc, #72]	; (80011dc <TransmitDataTask+0x130>)
- 8001192:	781b      	ldrb	r3, [r3, #0]
- 8001194:	2b03      	cmp	r3, #3
- 8001196:	d18d      	bne.n	80010b4 <TransmitDataTask+0x8>
+ 8001192:	4b12      	ldr	r3, [pc, #72]	; (80011dc <TransmitDataTask+0x130>)
+ 8001194:	781b      	ldrb	r3, [r3, #0]
+ 8001196:	2b03      	cmp	r3, #3
+ 8001198:	d18c      	bne.n	80010b4 <TransmitDataTask+0x8>
 			psensor = BSP_PSENSOR_ReadPressure();
- 8001198:	f000 fadc 	bl	8001754 <BSP_PSENSOR_ReadPressure>
- 800119c:	eef0 7a40 	vmov.f32	s15, s0
- 80011a0:	4b15      	ldr	r3, [pc, #84]	; (80011f8 <TransmitDataTask+0x14c>)
- 80011a2:	edc3 7a00 	vstr	s15, [r3]
+ 800119a:	f000 fadb 	bl	8001754 <BSP_PSENSOR_ReadPressure>
+ 800119e:	eef0 7a40 	vmov.f32	s15, s0
+ 80011a2:	4b15      	ldr	r3, [pc, #84]	; (80011f8 <TransmitDataTask+0x14c>)
+ 80011a4:	edc3 7a00 	vstr	s15, [r3]
 			sprintf(msgBuff2, "\n Transmitting...\r");
- 80011a6:	4a0f      	ldr	r2, [pc, #60]	; (80011e4 <TransmitDataTask+0x138>)
- 80011a8:	4b0f      	ldr	r3, [pc, #60]	; (80011e8 <TransmitDataTask+0x13c>)
- 80011aa:	4615      	mov	r5, r2
- 80011ac:	461c      	mov	r4, r3
- 80011ae:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
- 80011b0:	6028      	str	r0, [r5, #0]
- 80011b2:	6069      	str	r1, [r5, #4]
- 80011b4:	60aa      	str	r2, [r5, #8]
- 80011b6:	60eb      	str	r3, [r5, #12]
- 80011b8:	8823      	ldrh	r3, [r4, #0]
- 80011ba:	78a2      	ldrb	r2, [r4, #2]
- 80011bc:	822b      	strh	r3, [r5, #16]
- 80011be:	4613      	mov	r3, r2
- 80011c0:	74ab      	strb	r3, [r5, #18]
+ 80011a8:	4a0e      	ldr	r2, [pc, #56]	; (80011e4 <TransmitDataTask+0x138>)
+ 80011aa:	4b0f      	ldr	r3, [pc, #60]	; (80011e8 <TransmitDataTask+0x13c>)
+ 80011ac:	4615      	mov	r5, r2
+ 80011ae:	461c      	mov	r4, r3
+ 80011b0:	cc0f      	ldmia	r4!, {r0, r1, r2, r3}
+ 80011b2:	6028      	str	r0, [r5, #0]
+ 80011b4:	6069      	str	r1, [r5, #4]
+ 80011b6:	60aa      	str	r2, [r5, #8]
+ 80011b8:	60eb      	str	r3, [r5, #12]
+ 80011ba:	8823      	ldrh	r3, [r4, #0]
+ 80011bc:	78a2      	ldrb	r2, [r4, #2]
+ 80011be:	822b      	strh	r3, [r5, #16]
+ 80011c0:	4613      	mov	r3, r2
+ 80011c2:	74ab      	strb	r3, [r5, #18]
 			HAL_UART_Transmit(&huart1, (uint8_t*)msgBuff2, strlen(msgBuff2), HAL_UART_TIMEOUT_VALUE);
- 80011c2:	4808      	ldr	r0, [pc, #32]	; (80011e4 <TransmitDataTask+0x138>)
- 80011c4:	f7ff f81c 	bl	8000200 <strlen>
- 80011c8:	4603      	mov	r3, r0
- 80011ca:	b29a      	uxth	r2, r3
- 80011cc:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 80011d0:	4904      	ldr	r1, [pc, #16]	; (80011e4 <TransmitDataTask+0x138>)
- 80011d2:	4806      	ldr	r0, [pc, #24]	; (80011ec <TransmitDataTask+0x140>)
- 80011d4:	f003 fe66 	bl	8004ea4 <HAL_UART_Transmit>
+ 80011c4:	4807      	ldr	r0, [pc, #28]	; (80011e4 <TransmitDataTask+0x138>)
+ 80011c6:	f7ff f81b 	bl	8000200 <strlen>
+ 80011ca:	4603      	mov	r3, r0
+ 80011cc:	b29a      	uxth	r2, r3
+ 80011ce:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 80011d2:	4904      	ldr	r1, [pc, #16]	; (80011e4 <TransmitDataTask+0x138>)
+ 80011d4:	4805      	ldr	r0, [pc, #20]	; (80011ec <TransmitDataTask+0x140>)
+ 80011d6:	f003 fe65 	bl	8004ea4 <HAL_UART_Transmit>
 		osDelay(OSDELAY2);
- 80011d8:	e76c      	b.n	80010b4 <TransmitDataTask+0x8>
- 80011da:	bf00      	nop
+ 80011da:	e76b      	b.n	80010b4 <TransmitDataTask+0x8>
  80011dc:	20000340 	.word	0x20000340
- 80011e0:	200013ac 	.word	0x200013ac
- 80011e4:	200013b0 	.word	0x200013b0
+ 80011e0:	20001604 	.word	0x20001604
+ 80011e4:	20001608 	.word	0x20001608
  80011e8:	0800780c 	.word	0x0800780c
- 80011ec:	20001250 	.word	0x20001250
- 80011f0:	20001240 	.word	0x20001240
- 80011f4:	20001418 	.word	0x20001418
- 80011f8:	20001414 	.word	0x20001414
+ 80011ec:	200013e0 	.word	0x200013e0
+ 80011f0:	200013d0 	.word	0x200013d0
+ 80011f4:	200016d4 	.word	0x200016d4
+ 80011f8:	200016d0 	.word	0x200016d0
 
 080011fc <ReadSensorDataTask>:
 * @param argument: Not used
@@ -2377,133 +2376,132 @@ void ReadSensorDataTask(void const * argument)
   for(;;)
   {
     osDelay(OSDELAY2);
- 8001204:	20fa      	movs	r0, #250	; 0xfa
- 8001206:	f004 fcaa 	bl	8005b5e <osDelay>
+ 8001204:	f246 10a8 	movw	r0, #25000	; 0x61a8
+ 8001208:	f004 fca9 	bl	8005b5e <osDelay>
 	if(state%4 == 0){
- 800120a:	4b3f      	ldr	r3, [pc, #252]	; (8001308 <ReadSensorDataTask+0x10c>)
- 800120c:	781b      	ldrb	r3, [r3, #0]
- 800120e:	f003 0303 	and.w	r3, r3, #3
- 8001212:	b2db      	uxtb	r3, r3
- 8001214:	2b00      	cmp	r3, #0
- 8001216:	d116      	bne.n	8001246 <ReadSensorDataTask+0x4a>
+ 800120c:	4b3e      	ldr	r3, [pc, #248]	; (8001308 <ReadSensorDataTask+0x10c>)
+ 800120e:	781b      	ldrb	r3, [r3, #0]
+ 8001210:	f003 0303 	and.w	r3, r3, #3
+ 8001214:	b2db      	uxtb	r3, r3
+ 8001216:	2b00      	cmp	r3, #0
+ 8001218:	d116      	bne.n	8001248 <ReadSensorDataTask+0x4c>
 		sprintf(hSensor_buffer, "\n Humidity Value: %d\r", (int)hValue);
- 8001218:	4b3c      	ldr	r3, [pc, #240]	; (800130c <ReadSensorDataTask+0x110>)
- 800121a:	edd3 7a00 	vldr	s15, [r3]
- 800121e:	eefd 7ae7 	vcvt.s32.f32	s15, s15
- 8001222:	ee17 2a90 	vmov	r2, s15
- 8001226:	493a      	ldr	r1, [pc, #232]	; (8001310 <ReadSensorDataTask+0x114>)
- 8001228:	483a      	ldr	r0, [pc, #232]	; (8001314 <ReadSensorDataTask+0x118>)
- 800122a:	f005 fe8f 	bl	8006f4c <siprintf>
+ 800121a:	4b3c      	ldr	r3, [pc, #240]	; (800130c <ReadSensorDataTask+0x110>)
+ 800121c:	edd3 7a00 	vldr	s15, [r3]
+ 8001220:	eefd 7ae7 	vcvt.s32.f32	s15, s15
+ 8001224:	ee17 2a90 	vmov	r2, s15
+ 8001228:	4939      	ldr	r1, [pc, #228]	; (8001310 <ReadSensorDataTask+0x114>)
+ 800122a:	483a      	ldr	r0, [pc, #232]	; (8001314 <ReadSensorDataTask+0x118>)
+ 800122c:	f005 fe8e 	bl	8006f4c <siprintf>
 		HAL_UART_Transmit(&huart1, (uint8_t*)hSensor_buffer, strlen(hSensor_buffer), HAL_UART_TIMEOUT_VALUE);
- 800122e:	4839      	ldr	r0, [pc, #228]	; (8001314 <ReadSensorDataTask+0x118>)
- 8001230:	f7fe ffe6 	bl	8000200 <strlen>
- 8001234:	4603      	mov	r3, r0
- 8001236:	b29a      	uxth	r2, r3
- 8001238:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 800123c:	4935      	ldr	r1, [pc, #212]	; (8001314 <ReadSensorDataTask+0x118>)
- 800123e:	4836      	ldr	r0, [pc, #216]	; (8001318 <ReadSensorDataTask+0x11c>)
- 8001240:	f003 fe30 	bl	8004ea4 <HAL_UART_Transmit>
- 8001244:	e7de      	b.n	8001204 <ReadSensorDataTask+0x8>
+ 8001230:	4838      	ldr	r0, [pc, #224]	; (8001314 <ReadSensorDataTask+0x118>)
+ 8001232:	f7fe ffe5 	bl	8000200 <strlen>
+ 8001236:	4603      	mov	r3, r0
+ 8001238:	b29a      	uxth	r2, r3
+ 800123a:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 800123e:	4935      	ldr	r1, [pc, #212]	; (8001314 <ReadSensorDataTask+0x118>)
+ 8001240:	4835      	ldr	r0, [pc, #212]	; (8001318 <ReadSensorDataTask+0x11c>)
+ 8001242:	f003 fe2f 	bl	8004ea4 <HAL_UART_Transmit>
+ 8001246:	e7dd      	b.n	8001204 <ReadSensorDataTask+0x8>
 	}
 	else if(state%4 == 1){
- 8001246:	4b30      	ldr	r3, [pc, #192]	; (8001308 <ReadSensorDataTask+0x10c>)
- 8001248:	781b      	ldrb	r3, [r3, #0]
- 800124a:	f003 0303 	and.w	r3, r3, #3
- 800124e:	b2db      	uxtb	r3, r3
- 8001250:	2b01      	cmp	r3, #1
- 8001252:	d116      	bne.n	8001282 <ReadSensorDataTask+0x86>
+ 8001248:	4b2f      	ldr	r3, [pc, #188]	; (8001308 <ReadSensorDataTask+0x10c>)
+ 800124a:	781b      	ldrb	r3, [r3, #0]
+ 800124c:	f003 0303 	and.w	r3, r3, #3
+ 8001250:	b2db      	uxtb	r3, r3
+ 8001252:	2b01      	cmp	r3, #1
+ 8001254:	d116      	bne.n	8001284 <ReadSensorDataTask+0x88>
 		sprintf(tSensor_buffer, "\n Temperature Value: %d C\r", (int)tValue);
- 8001254:	4b31      	ldr	r3, [pc, #196]	; (800131c <ReadSensorDataTask+0x120>)
- 8001256:	edd3 7a00 	vldr	s15, [r3]
- 800125a:	eefd 7ae7 	vcvt.s32.f32	s15, s15
- 800125e:	ee17 2a90 	vmov	r2, s15
- 8001262:	492f      	ldr	r1, [pc, #188]	; (8001320 <ReadSensorDataTask+0x124>)
- 8001264:	482f      	ldr	r0, [pc, #188]	; (8001324 <ReadSensorDataTask+0x128>)
- 8001266:	f005 fe71 	bl	8006f4c <siprintf>
+ 8001256:	4b31      	ldr	r3, [pc, #196]	; (800131c <ReadSensorDataTask+0x120>)
+ 8001258:	edd3 7a00 	vldr	s15, [r3]
+ 800125c:	eefd 7ae7 	vcvt.s32.f32	s15, s15
+ 8001260:	ee17 2a90 	vmov	r2, s15
+ 8001264:	492e      	ldr	r1, [pc, #184]	; (8001320 <ReadSensorDataTask+0x124>)
+ 8001266:	482f      	ldr	r0, [pc, #188]	; (8001324 <ReadSensorDataTask+0x128>)
+ 8001268:	f005 fe70 	bl	8006f4c <siprintf>
 		HAL_UART_Transmit(&huart1, (uint8_t*)tSensor_buffer, strlen(tSensor_buffer), HAL_UART_TIMEOUT_VALUE);
- 800126a:	482e      	ldr	r0, [pc, #184]	; (8001324 <ReadSensorDataTask+0x128>)
- 800126c:	f7fe ffc8 	bl	8000200 <strlen>
- 8001270:	4603      	mov	r3, r0
- 8001272:	b29a      	uxth	r2, r3
- 8001274:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 8001278:	492a      	ldr	r1, [pc, #168]	; (8001324 <ReadSensorDataTask+0x128>)
- 800127a:	4827      	ldr	r0, [pc, #156]	; (8001318 <ReadSensorDataTask+0x11c>)
- 800127c:	f003 fe12 	bl	8004ea4 <HAL_UART_Transmit>
- 8001280:	e7c0      	b.n	8001204 <ReadSensorDataTask+0x8>
+ 800126c:	482d      	ldr	r0, [pc, #180]	; (8001324 <ReadSensorDataTask+0x128>)
+ 800126e:	f7fe ffc7 	bl	8000200 <strlen>
+ 8001272:	4603      	mov	r3, r0
+ 8001274:	b29a      	uxth	r2, r3
+ 8001276:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 800127a:	492a      	ldr	r1, [pc, #168]	; (8001324 <ReadSensorDataTask+0x128>)
+ 800127c:	4826      	ldr	r0, [pc, #152]	; (8001318 <ReadSensorDataTask+0x11c>)
+ 800127e:	f003 fe11 	bl	8004ea4 <HAL_UART_Transmit>
+ 8001282:	e7bf      	b.n	8001204 <ReadSensorDataTask+0x8>
 	}
 	else if(state%4 == 2){
- 8001282:	4b21      	ldr	r3, [pc, #132]	; (8001308 <ReadSensorDataTask+0x10c>)
- 8001284:	781b      	ldrb	r3, [r3, #0]
- 8001286:	f003 0303 	and.w	r3, r3, #3
- 800128a:	b2db      	uxtb	r3, r3
- 800128c:	2b02      	cmp	r3, #2
- 800128e:	d11c      	bne.n	80012ca <ReadSensorDataTask+0xce>
+ 8001284:	4b20      	ldr	r3, [pc, #128]	; (8001308 <ReadSensorDataTask+0x10c>)
+ 8001286:	781b      	ldrb	r3, [r3, #0]
+ 8001288:	f003 0303 	and.w	r3, r3, #3
+ 800128c:	b2db      	uxtb	r3, r3
+ 800128e:	2b02      	cmp	r3, #2
+ 8001290:	d11c      	bne.n	80012cc <ReadSensorDataTask+0xd0>
 		sprintf(accelero_buffer, "\n Accelerometer Values: X: %d Y: %d Z: %d\r", accelero[0], accelero[1], accelero[2]);
- 8001290:	4b25      	ldr	r3, [pc, #148]	; (8001328 <ReadSensorDataTask+0x12c>)
- 8001292:	f9b3 3000 	ldrsh.w	r3, [r3]
- 8001296:	461a      	mov	r2, r3
- 8001298:	4b23      	ldr	r3, [pc, #140]	; (8001328 <ReadSensorDataTask+0x12c>)
- 800129a:	f9b3 3002 	ldrsh.w	r3, [r3, #2]
- 800129e:	4619      	mov	r1, r3
- 80012a0:	4b21      	ldr	r3, [pc, #132]	; (8001328 <ReadSensorDataTask+0x12c>)
- 80012a2:	f9b3 3004 	ldrsh.w	r3, [r3, #4]
- 80012a6:	9300      	str	r3, [sp, #0]
- 80012a8:	460b      	mov	r3, r1
- 80012aa:	4920      	ldr	r1, [pc, #128]	; (800132c <ReadSensorDataTask+0x130>)
- 80012ac:	4820      	ldr	r0, [pc, #128]	; (8001330 <ReadSensorDataTask+0x134>)
- 80012ae:	f005 fe4d 	bl	8006f4c <siprintf>
+ 8001292:	4b25      	ldr	r3, [pc, #148]	; (8001328 <ReadSensorDataTask+0x12c>)
+ 8001294:	f9b3 3000 	ldrsh.w	r3, [r3]
+ 8001298:	461a      	mov	r2, r3
+ 800129a:	4b23      	ldr	r3, [pc, #140]	; (8001328 <ReadSensorDataTask+0x12c>)
+ 800129c:	f9b3 3002 	ldrsh.w	r3, [r3, #2]
+ 80012a0:	4619      	mov	r1, r3
+ 80012a2:	4b21      	ldr	r3, [pc, #132]	; (8001328 <ReadSensorDataTask+0x12c>)
+ 80012a4:	f9b3 3004 	ldrsh.w	r3, [r3, #4]
+ 80012a8:	9300      	str	r3, [sp, #0]
+ 80012aa:	460b      	mov	r3, r1
+ 80012ac:	491f      	ldr	r1, [pc, #124]	; (800132c <ReadSensorDataTask+0x130>)
+ 80012ae:	4820      	ldr	r0, [pc, #128]	; (8001330 <ReadSensorDataTask+0x134>)
+ 80012b0:	f005 fe4c 	bl	8006f4c <siprintf>
 		HAL_UART_Transmit(&huart1, (uint8_t*)accelero_buffer, strlen(accelero_buffer), HAL_UART_TIMEOUT_VALUE);
- 80012b2:	481f      	ldr	r0, [pc, #124]	; (8001330 <ReadSensorDataTask+0x134>)
- 80012b4:	f7fe ffa4 	bl	8000200 <strlen>
- 80012b8:	4603      	mov	r3, r0
- 80012ba:	b29a      	uxth	r2, r3
- 80012bc:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 80012c0:	491b      	ldr	r1, [pc, #108]	; (8001330 <ReadSensorDataTask+0x134>)
- 80012c2:	4815      	ldr	r0, [pc, #84]	; (8001318 <ReadSensorDataTask+0x11c>)
- 80012c4:	f003 fdee 	bl	8004ea4 <HAL_UART_Transmit>
- 80012c8:	e79c      	b.n	8001204 <ReadSensorDataTask+0x8>
+ 80012b4:	481e      	ldr	r0, [pc, #120]	; (8001330 <ReadSensorDataTask+0x134>)
+ 80012b6:	f7fe ffa3 	bl	8000200 <strlen>
+ 80012ba:	4603      	mov	r3, r0
+ 80012bc:	b29a      	uxth	r2, r3
+ 80012be:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 80012c2:	491b      	ldr	r1, [pc, #108]	; (8001330 <ReadSensorDataTask+0x134>)
+ 80012c4:	4814      	ldr	r0, [pc, #80]	; (8001318 <ReadSensorDataTask+0x11c>)
+ 80012c6:	f003 fded 	bl	8004ea4 <HAL_UART_Transmit>
+ 80012ca:	e79b      	b.n	8001204 <ReadSensorDataTask+0x8>
 	}
 	else if(state%4 == 3){
- 80012ca:	4b0f      	ldr	r3, [pc, #60]	; (8001308 <ReadSensorDataTask+0x10c>)
- 80012cc:	781b      	ldrb	r3, [r3, #0]
- 80012ce:	f003 0303 	and.w	r3, r3, #3
- 80012d2:	b2db      	uxtb	r3, r3
- 80012d4:	2b03      	cmp	r3, #3
- 80012d6:	d195      	bne.n	8001204 <ReadSensorDataTask+0x8>
+ 80012cc:	4b0e      	ldr	r3, [pc, #56]	; (8001308 <ReadSensorDataTask+0x10c>)
+ 80012ce:	781b      	ldrb	r3, [r3, #0]
+ 80012d0:	f003 0303 	and.w	r3, r3, #3
+ 80012d4:	b2db      	uxtb	r3, r3
+ 80012d6:	2b03      	cmp	r3, #3
+ 80012d8:	d194      	bne.n	8001204 <ReadSensorDataTask+0x8>
 		sprintf(pressure_buff, "\n Pressure Value: %d Pa\r", (int)psensor);
- 80012d8:	4b16      	ldr	r3, [pc, #88]	; (8001334 <ReadSensorDataTask+0x138>)
- 80012da:	edd3 7a00 	vldr	s15, [r3]
- 80012de:	eefd 7ae7 	vcvt.s32.f32	s15, s15
- 80012e2:	ee17 2a90 	vmov	r2, s15
- 80012e6:	4914      	ldr	r1, [pc, #80]	; (8001338 <ReadSensorDataTask+0x13c>)
- 80012e8:	4814      	ldr	r0, [pc, #80]	; (800133c <ReadSensorDataTask+0x140>)
- 80012ea:	f005 fe2f 	bl	8006f4c <siprintf>
+ 80012da:	4b16      	ldr	r3, [pc, #88]	; (8001334 <ReadSensorDataTask+0x138>)
+ 80012dc:	edd3 7a00 	vldr	s15, [r3]
+ 80012e0:	eefd 7ae7 	vcvt.s32.f32	s15, s15
+ 80012e4:	ee17 2a90 	vmov	r2, s15
+ 80012e8:	4913      	ldr	r1, [pc, #76]	; (8001338 <ReadSensorDataTask+0x13c>)
+ 80012ea:	4814      	ldr	r0, [pc, #80]	; (800133c <ReadSensorDataTask+0x140>)
+ 80012ec:	f005 fe2e 	bl	8006f4c <siprintf>
 		HAL_UART_Transmit(&huart1, (uint8_t*)pressure_buff, strlen(pressure_buff), HAL_UART_TIMEOUT_VALUE);
- 80012ee:	4813      	ldr	r0, [pc, #76]	; (800133c <ReadSensorDataTask+0x140>)
- 80012f0:	f7fe ff86 	bl	8000200 <strlen>
- 80012f4:	4603      	mov	r3, r0
- 80012f6:	b29a      	uxth	r2, r3
- 80012f8:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
- 80012fc:	490f      	ldr	r1, [pc, #60]	; (800133c <ReadSensorDataTask+0x140>)
- 80012fe:	4806      	ldr	r0, [pc, #24]	; (8001318 <ReadSensorDataTask+0x11c>)
- 8001300:	f003 fdd0 	bl	8004ea4 <HAL_UART_Transmit>
+ 80012f0:	4812      	ldr	r0, [pc, #72]	; (800133c <ReadSensorDataTask+0x140>)
+ 80012f2:	f7fe ff85 	bl	8000200 <strlen>
+ 80012f6:	4603      	mov	r3, r0
+ 80012f8:	b29a      	uxth	r2, r3
+ 80012fa:	f06f 437e 	mvn.w	r3, #4261412864	; 0xfe000000
+ 80012fe:	490f      	ldr	r1, [pc, #60]	; (800133c <ReadSensorDataTask+0x140>)
+ 8001300:	4805      	ldr	r0, [pc, #20]	; (8001318 <ReadSensorDataTask+0x11c>)
+ 8001302:	f003 fdcf 	bl	8004ea4 <HAL_UART_Transmit>
     osDelay(OSDELAY2);
- 8001304:	e77e      	b.n	8001204 <ReadSensorDataTask+0x8>
- 8001306:	bf00      	nop
+ 8001306:	e77d      	b.n	8001204 <ReadSensorDataTask+0x8>
  8001308:	20000340 	.word	0x20000340
- 800130c:	200013ac 	.word	0x200013ac
+ 800130c:	20001604 	.word	0x20001604
  8001310:	08007820 	.word	0x08007820
- 8001314:	20001178 	.word	0x20001178
- 8001318:	20001250 	.word	0x20001250
- 800131c:	20001240 	.word	0x20001240
+ 8001314:	20001240 	.word	0x20001240
+ 8001318:	200013e0 	.word	0x200013e0
+ 800131c:	200013d0 	.word	0x200013d0
  8001320:	08007838 	.word	0x08007838
- 8001324:	200011dc 	.word	0x200011dc
- 8001328:	20001418 	.word	0x20001418
+ 8001324:	20001308 	.word	0x20001308
+ 8001328:	200016d4 	.word	0x200016d4
  800132c:	08007854 	.word	0x08007854
- 8001330:	20001114 	.word	0x20001114
- 8001334:	20001414 	.word	0x20001414
+ 8001330:	20001178 	.word	0x20001178
+ 8001334:	200016d0 	.word	0x200016d0
  8001338:	08007880 	.word	0x08007880
- 800133c:	200012e4 	.word	0x200012e4
+ 800133c:	20001474 	.word	0x20001474
 
 08001340 <HAL_TIM_PeriodElapsedCallback>:
   * a global variable "uwTick" used as application time base.
@@ -2908,7 +2906,7 @@ void SENSOR_IO_Init(void)
  8001556:	bf00      	nop
  8001558:	bd80      	pop	{r7, pc}
  800155a:	bf00      	nop
- 800155c:	200014b0 	.word	0x200014b0
+ 800155c:	2000176c 	.word	0x2000176c
 
 08001560 <SENSOR_IO_Write>:
   * @param  Reg  Reg address
@@ -2942,7 +2940,7 @@ void SENSOR_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value)
  800158a:	3708      	adds	r7, #8
  800158c:	46bd      	mov	sp, r7
  800158e:	bd80      	pop	{r7, pc}
- 8001590:	200014b0 	.word	0x200014b0
+ 8001590:	2000176c 	.word	0x2000176c
 
 08001594 <SENSOR_IO_Read>:
   * @param  Addr  I2C address
@@ -2983,7 +2981,7 @@ uint8_t SENSOR_IO_Read(uint8_t Addr, uint8_t Reg)
  80015c6:	46bd      	mov	sp, r7
  80015c8:	bd80      	pop	{r7, pc}
  80015ca:	bf00      	nop
- 80015cc:	200014b0 	.word	0x200014b0
+ 80015cc:	2000176c 	.word	0x2000176c
 
 080015d0 <SENSOR_IO_ReadMultiple>:
   * @param  Buffer  Pointer to data buffer
@@ -3021,7 +3019,7 @@ uint16_t SENSOR_IO_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint
  8001602:	3708      	adds	r7, #8
  8001604:	46bd      	mov	sp, r7
  8001606:	bd80      	pop	{r7, pc}
- 8001608:	200014b0 	.word	0x200014b0
+ 8001608:	2000176c 	.word	0x2000176c
 
 0800160c <BSP_ACCELERO_Init>:
 /**
@@ -3797,7 +3795,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
  8001a06:	bd80      	pop	{r7, pc}
  8001a08:	40021000 	.word	0x40021000
  8001a0c:	431bde83 	.word	0x431bde83
- 8001a10:	200014fc 	.word	0x200014fc
+ 8001a10:	200017b8 	.word	0x200017b8
  8001a14:	40001000 	.word	0x40001000
 
 08001a18 <NMI_Handler>:
@@ -3940,7 +3938,7 @@ void TIM6_DAC_IRQHandler(void)
  8001a5e:	bf00      	nop
  8001a60:	bd80      	pop	{r7, pc}
  8001a62:	bf00      	nop
- 8001a64:	200014fc 	.word	0x200014fc
+ 8001a64:	200017b8 	.word	0x200017b8
 
 08001a68 <_sbrk>:
  *
@@ -4021,7 +4019,7 @@ void *_sbrk(ptrdiff_t incr)
  8001ac4:	200a0000 	.word	0x200a0000
  8001ac8:	00000400 	.word	0x00000400
  8001acc:	20000354 	.word	0x20000354
- 8001ad0:	20001550 	.word	0x20001550
+ 8001ad0:	20001810 	.word	0x20001810
 
 08001ad4 <SystemInit>:
   * @param  None
@@ -4194,7 +4192,7 @@ LoopForever:
 	ldr	r2, =_sbss
  8001b88:	200000d0 	.word	0x200000d0
 	ldr	r3, = _ebss
- 8001b8c:	20001550 	.word	0x20001550
+ 8001b8c:	2000180c 	.word	0x2000180c
 
 08001b90 <ADC1_IRQHandler>:
  * @retval : None
@@ -4282,7 +4280,7 @@ __weak void HAL_IncTick(void)
  8001be0:	4770      	bx	lr
  8001be2:	bf00      	nop
  8001be4:	20000064 	.word	0x20000064
- 8001be8:	20001548 	.word	0x20001548
+ 8001be8:	20001804 	.word	0x20001804
 
 08001bec <HAL_GetTick>:
   * @note This function is declared as __weak to be overwritten in case of other
@@ -4302,7 +4300,7 @@ __weak uint32_t HAL_GetTick(void)
  8001bf8:	f85d 7b04 	ldr.w	r7, [sp], #4
  8001bfc:	4770      	bx	lr
  8001bfe:	bf00      	nop
- 8001c00:	20001548 	.word	0x20001548
+ 8001c00:	20001804 	.word	0x20001804
 
 08001c04 <__NVIC_SetPriorityGrouping>:
            In case of a conflict between priority grouping and available
@@ -20026,7 +20024,7 @@ uint8_t *puc;
  8007726:	b103      	cbz	r3, 800772a <_sbrk_r+0x1a>
  8007728:	602b      	str	r3, [r5, #0]
  800772a:	bd38      	pop	{r3, r4, r5, pc}
- 800772c:	2000154c 	.word	0x2000154c
+ 800772c:	20001808 	.word	0x20001808
 
 08007730 <__malloc_lock>:
  8007730:	4770      	bx	lr
